@@ -1,0 +1,9 @@
+## 核心 ##
+
+#安装指定版本的Langchain
+pip install langchain==0.3.7 -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install langchain-openai==0.2.3 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+## 安全性 ##
+#dotenv,用于解耦apikey（安全性库）
+dotenv
