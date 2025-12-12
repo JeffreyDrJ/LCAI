@@ -16,7 +16,7 @@ class IntentAgent:
 
     用户输入：{user_input}
     """
-
+    #TODO 把提示词模板整合封装到LangchainTemplate里
     @classmethod
     async def recognize_intent(cls, user_input: str) -> Literal["qa", "form_build", "unknown"]:
         """

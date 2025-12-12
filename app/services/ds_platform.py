@@ -29,7 +29,8 @@ class DSPlatformClient:
         :return: LLM响应结果
         """
         headers = {
-            "Content-Type": "application/json",
+            # "Content-Type": "application/json",
+            "Accept": "application/json",
             "Authorization": f"Bearer {api_key}"
         }
 
@@ -43,7 +44,7 @@ class DSPlatformClient:
         try:
             logger.info(f"调用DS平台LLM：model={settings.DS_MODEL_NAME}, stream={stream}")
             response = await self.client.post(
-                url=self.base_url,
+                url=self.base_url + "/chat/completions",
                 headers=headers,
                 json=payload
             )

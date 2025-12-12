@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from typing import Generator, Dict, Any
-from app.models.schema import LCAIRequest, LCAIResponse, LCAIStreamChunk
+from app.models.schema import LCAIRequest, LCAIResponse, LCAIStreamChunk, LCAIMeta
 from app.models.state import LCAIState
 from app.graph.lcai_graph import lcai_graph
 from app.utils.logger import logger
@@ -19,13 +19,16 @@ async def invoke_lcai(request: LCAIRequest):
     :return: 同步响应结果
     """
     try:
-        logger.info(f"同步调用LCAI：session_id={request.session_id}，user_input={request.user_input[:50]}...")
+        logger.info(f"同步调用LCAI: 用户：{request.meta.userId}-{request.meta.lcUserName} | 环境：{request.meta.origin} "
+                    f"| 场景信息：workspace={request.meta.cur_workspaceId}, app={request.meta.cur_appId}, form={request.meta.cur_modelId} | user_input={request.user_input[:50]}...")
 
         # 构建初始状态
         initial_state = LCAIState(
-            session_id=request.session_id,
+            session_id=request.meta.chatId,
             user_input=request.user_input,
             messages=[{"role": "user", "content": request.user_input}]
+            # 可选：将meta存入状态，供智能体流程使用（比如根据origin选择不同DS平台环境）
+            # meta=LCAIMeta.model_dump()
         )
 
         # 执行LangGraph流程
@@ -68,7 +71,8 @@ async def stream_lcai(request: LCAIRequest):
     :return: 流式响应结果
     """
     try:
-        logger.info(f"流式调用LCAI：session_id={request.session_id}，user_input={request.user_input[:50]}...")
+        logger.info(f"同步调用LCAI: 用户：{request.meta.userId}-{request.meta.lcUserName} | 环境：{request.meta.origin} "
+                    f"| 场景信息：workspace={request.meta.cur_workspaceId}, app={request.meta.cur_appId}, form={request.meta.cur_modelId} | user_input={request.user_input[:50]}...")
 
         # 构建初始状态
         initial_state = LCAIState(

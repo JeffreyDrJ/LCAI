@@ -14,3 +14,18 @@
 
 或访问下述网址：
 - 健康检查： <http://localhost:8000/health>
+
+## 4.示例请求
+***POST:*** <http://localhost:8000/api/v1/lcai/invoke>
+```json
+{
+    "user_input": "低代码平台有哪些功能？",
+    "meta": {
+        "chatId": "123",
+        "userId": "563504",
+        "lcUserName": "丁仁杰",
+        "origin":"https://eplatdev.baocloud.cn"
+    },
+    "stream": false
+}
+```
