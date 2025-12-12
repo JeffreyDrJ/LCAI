@@ -1,0 +1,36 @@
+lcai/
+├── app/
+│   ├── __init__.py                # 包标识
+│   ├── main.py                    # FastAPI入口（服务启动）
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── settings.py            # 环境配置（DS平台密钥、API地址等）
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── schema.py              # API请求/响应模型
+│   │   └── state.py               # LangGraph状态定义
+│   ├── agents/
+│   │   ├── __init__.py
+│   │   ├── intent_agent.py        # 需求判断智能体
+│   │   ├── qa_agent.py            # 低代码问答智能体
+│   │   ├── form_build_agent.py    # 表单搭建智能体
+│   │   └── form_modify_agent.py   # 表单修改智能体
+│   ├── graph/
+│   │   ├── __init__.py
+│   │   └── lcai_graph.py          # LangGraph核心流程编排
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       └── lcai.py            # LCAI核心API接口
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── ds_platform.py         # 宝武DS平台LLM调用封装
+│   │   └── form_storage.py        # 表单保存第三方API调用
+│   └── utils/
+│       ├── __init__.py
+│       ├── logger.py              # 日志配置
+│       └── exceptions.py          # 自定义异常
+├── .env                           # 环境变量配置
+├── requirements.txt               # 项目依赖
+└── README.md                      # 项目说明

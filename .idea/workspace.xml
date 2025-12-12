@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="test101 新增一些测试，跑通了ds接口">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/表单搭建智能体项目开发计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/config/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tests/01-测试调用宝武DS单智能体(成功).py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tests/02-测试调用宝武DS单智能体(多轮对话).py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/lcai.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/lcai.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-    </list>
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,7 +20,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="feature/test101" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -56,29 +45,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.01-测试调用宝武DS单智能体.executor": "Run",
-    "Python.02-测试调用宝武DS单智能体(多轮对话).executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "feature/test101",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/mycode/lcai/src/tests",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.01-测试调用宝武DS单智能体.executor&quot;: &quot;Run&quot;,
+    &quot;Python.02-测试调用宝武DS单智能体(多轮对话).executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.python app/main.py.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/dev251212a&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/mycode/lcai/src/tests&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\mycode\lcai\src\tests" />
@@ -91,6 +81,37 @@
       <recent name="D:\mycode\lcai\src" />
       <recent name="D:\mycode\lcai" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="python app/main.py" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="lcai" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="app/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.python app/main.py" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -109,6 +130,8 @@
       <updated>1765435815598</updated>
       <workItem from="1765435816849" duration="8072000" />
       <workItem from="1765444370814" duration="666000" />
+      <workItem from="1765500202172" duration="13640000" />
+      <workItem from="1765526095961" duration="334000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -134,7 +157,47 @@
       <option name="project" value="LOCAL" />
       <updated>1765444430258</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+      <option name="closed" value="true" />
+      <created>1765526023983</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1765526023983</updated>
+    </task>
+    <task id="LOCAL-00005" summary="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+      <option name="closed" value="true" />
+      <created>1765526122471</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1765526122471</updated>
+    </task>
+    <task id="LOCAL-00006" summary="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+      <option name="closed" value="true" />
+      <created>1765526290286</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1765526290286</updated>
+    </task>
+    <task id="LOCAL-00007" summary="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+      <option name="closed" value="true" />
+      <created>1765526352721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765526352721</updated>
+    </task>
+    <task id="LOCAL-00008" summary="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+      <option name="closed" value="true" />
+      <created>1765526396051</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765526396051</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,22 +216,13 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test101 新增一些测试，跑通了ds接口" />
-    <option name="LAST_COMMIT_MESSAGE" value="test101 新增一些测试，跑通了ds接口" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/main.py</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/lcai$02_DS__.coverage" NAME="02-测试调用宝武DS单智能体(多轮对话) Coverage Results" MODIFIED="1765443966329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
+    <SUITE FILE_PATH="coverage/lcai$02_DS__.coverage" NAME="02-测试调用宝武DS单智能体(多轮对话) Coverage Results" MODIFIED="1765515753898" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$01_DS.coverage" NAME="01-测试调用宝武DS单智能体 Coverage Results" MODIFIED="1765443025312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
+    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1765523468265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lcai$main.coverage" NAME="main Coverage Results" MODIFIED="1765437190173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>
