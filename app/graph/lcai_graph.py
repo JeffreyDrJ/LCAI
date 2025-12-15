@@ -1,3 +1,4 @@
+from langchain_core.messages import SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 from typing import Dict, Any
@@ -22,11 +23,11 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
 
     """意图识别节点：判断用户意图类型"""
     try:
-        intent_type = await intent_agent.recognize_intent(state['user_input'])
+        intent_type = await intent_agent.recognize_intent(state.user_input)
         return {
             "intent_type": intent_type,
             "intent_desc": f"识别到用户意图类型：{intent_type}",
-            "messages": add_messages(state['messages'], [{"role": "system", "content": f"意图识别结果：{intent_type}"}])
+            "messages": add_messages(state.messages, [SystemMessage(content=f"意图识别结果：{intent_type}")])
         }
     except IntentRecognitionError as e:
         logger.error(f"意图识别节点失败：{str(e)}")
@@ -34,8 +35,8 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
             "intent_type": "unknown",
             "intent_desc": f"意图识别失败：{str(e)}",
             "finished": True,
-            "messages": add_messages(state['messages'],
-                                     [{"role": "assistant", "content": f"抱歉，无法识别您的需求：{str(e)}"}])
+            "messages": add_messages(state.messages,
+                                     [AIMessage(content=f"抱歉，无法识别您的需求：{str(e)}")])
             # TODO 可默认转为调用问答智能体
         }
 
@@ -43,17 +44,17 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
 async def qa_agent_node(state: LCAIState) -> Dict[str, Any]:
     """低代码问答节点：处理问答类需求"""
     try:
-        response = await qa_agent.answer(state['user_input'], stream=False)
+        response = await qa_agent.answer(state.user_input, stream=False)
         return {
             "finished": True,
-            "messages": add_messages(state['messages'], [{"role": "assistant", "content": response["content"]}])
+            "messages": add_messages(state.messages, [AIMessage(content=response["content"])])
         }
     except Exception as e:
         logger.error(f"问答智能体节点失败：{str(e)}")
         return {
             "finished": True,
-            "messages": add_messages(state['messages'],
-                                     [{"role": "assistant", "content": f"抱歉，无法解答您的问题：{str(e)}"}])
+            "messages": add_messages(state.messages,
+                                     [AIMessage(content=f"抱歉，无法解答您的问题：{str(e)}")])
         }
 
 
@@ -63,14 +64,15 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
         form_schema = await form_build_agent.build_form(state.user_input)
         return {
             "form_schema": form_schema,
-            "messages": add_messages(state.messages, [{"role": "assistant",
-                                                       "content": f"已为您生成表单结构：{form_schema.model_dump_json(ensure_ascii=False)}"}])
+            "messages": add_messages(state.messages, [AIMessage(
+                content=f"已为您生成表单结构：{form_schema.model_dump_json(ensure_ascii=False)}"
+            )])
         }
     except Exception as e:
         logger.error(f"表单搭建节点失败：{str(e)}")
         return {
             "finished": True,
-            "messages": add_messages(state.messages, [{"role": "assistant", "content": f"抱歉，表单生成失败：{str(e)}"}])
+            "messages": add_messages(state.messages, [AIMessage(content=f"抱歉，表单生成失败：{str(e)}")])
         }
 
 
@@ -81,7 +83,7 @@ async def form_save_node(state: LCAIState) -> Dict[str, Any]:
             "form_save_status": "failed",
             "form_save_msg": "表单结构为空，保存失败",
             "finished": True,
-            "messages": add_messages(state.messages, [{"role": "assistant", "content": "表单结构为空，保存失败"}])
+            "messages": add_messages(state.messages, [AIMessage(content="表单结构为空，保存失败")])
         }
 
     try:
@@ -93,8 +95,8 @@ async def form_save_node(state: LCAIState) -> Dict[str, Any]:
             "form_save_msg": save_result["msg"],
             "form_schema": state.form_schema,
             "messages": add_messages(state.messages, [
-                {"role": "assistant", "content": f"{save_result['msg']}，表单ID：{save_result['form_id']}"},
-                {"role": "assistant", "content": "请问您是否需要修改表单？如需修改请说明具体意见，如无需修改请回复“确认”"}
+                AIMessage(content=f"{save_result['msg']}，表单ID：{save_result['form_id']}"),
+                AIMessage(content="请问您是否需要修改表单？如需修改请说明具体意见，如无需修改请回复“确认”")
             ])
         }
     except FormStorageError as e:
@@ -103,7 +105,7 @@ async def form_save_node(state: LCAIState) -> Dict[str, Any]:
             "form_save_status": "failed",
             "form_save_msg": str(e),
             "finished": True,
-            "messages": add_messages(state.messages, [{"role": "assistant", "content": f"表单保存失败：{str(e)}"}])
+            "messages": add_messages(state.messages, [AIMessage(content=f"表单保存失败：{str(e)}")])
         }
 
 
@@ -112,7 +114,7 @@ async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
     if not state.form_schema:
         return {
             "finished": True,
-            "messages": add_messages(state.messages, [{"role": "assistant", "content": "暂无表单结构可修改"}])
+            "messages": add_messages(state.messages, [AIMessage(content="暂无表单结构可修改")])
         }
 
     try:
@@ -123,17 +125,16 @@ async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
             "form_schema": new_form_schema,
             "form_modify_history": modify_history,
             "messages": add_messages(state.messages, [
-                {"role": "assistant",
-                 "content": f"已为您修改表单：{new_form_schema.model_dump_json(ensure_ascii=False)}"},
-                {"role": "assistant",
-                 "content": "请问您是否需要继续修改表单？如需修改请说明具体意见，如无需修改请回复“确认”"}
+                AIMessage(content=f"已为您修改表单：{new_form_schema.model_dump_json(ensure_ascii=False)}"),
+                AIMessage(content="请问您是否需要继续修改表单？如需修改请说明具体意见，如无需修改请回复“确认”")
             ])
         }
     except Exception as e:
         logger.error(f"表单修改节点失败：{str(e)}")
         return {
-            "messages": add_messages(state.messages, [{"role": "assistant",
-                                                       "content": f"表单修改失败：{str(e)}，请问您是否需要重新修改？"}])
+            "messages": add_messages(state.messages, [AIMessage(
+                content=f"表单修改失败：{str(e)}，请问您是否需要重新修改？"
+            )])
         }
 
 
@@ -144,12 +145,12 @@ async def human_confirm_node(state: LCAIState) -> Dict[str, Any]:
         return {
             "finished": True,
             "human_confirm": True,
-            "messages": add_messages(state.messages, [{"role": "assistant", "content": "表单搭建完成，感谢您的使用！"}])
+            "messages": add_messages(state.messages, [AIMessage(content="表单搭建完成，感谢您的使用！")])
         }
     else:
         return {
             "need_modify": True,
-            "messages": add_messages(state.messages, [{"role": "system", "content": "用户需要修改表单"}])
+            "messages": add_messages(state.messages, [SystemMessage(content="用户需要修改表单")])
         }
 
 
@@ -196,7 +197,10 @@ def human_confirm_branch(state: LCAIState) -> str:
 # ------------------------------
 def build_lcai_graph():
     """构建LCAI核心流程图"""
-    graph = StateGraph(LCAIState)
+    graph = StateGraph(
+        state_schema=LCAIState,  # 强制状态为LCAIState对象
+        validate=True  # 启用状态校验（可选，增强类型检查）
+    )
 
     # 添加节点
     graph.add_node("intent_recognition", intent_recognition_node)

@@ -1,6 +1,9 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from typing import Generator, Dict, Any
+
+from langchain_core.messages import HumanMessage
+
 from app.models.schema import LCAIRequest, LCAIResponse, LCAIStreamChunk, LCAIMeta
 from app.models.state import LCAIState
 from app.graph.lcai_graph import lcai_graph
@@ -26,13 +29,24 @@ async def invoke_lcai(request: LCAIRequest):
         initial_state = LCAIState(
             session_id=request.meta.chatId,
             user_input=request.user_input,
-            messages=[{"role": "user", "content": request.user_input}]
+            messages=[HumanMessage(content=request.user_input)]
             # 可选：将meta存入状态，供智能体流程使用（比如根据origin选择不同DS平台环境）
             # meta=LCAIMeta.model_dump()
         )
+        logger.info(f"初始状态类型：{type(initial_state)}")  # 必须输出 <class 'app.models.state.LCAIState'>
 
         # 执行LangGraph流程
-        result = await lcai_graph.ainvoke(initial_state)
+        result = await lcai_graph.ainvoke(initial_state)  # 注意返回时为 dict类型
+
+        # 简化对话内容
+        conversation = []
+        for msg in result["messages"]:
+            # 仅保留user/assistant角色，用属性访问替代get()
+            if msg.type in ["human", "ai"]:
+                conversation.append({
+                    "role": msg.type,  # ✅ 消息对象属性
+                    "content": msg.content  # ✅ 消息对象属性
+                })
 
         # 构建响应
         response_data = {
@@ -42,14 +56,15 @@ async def invoke_lcai(request: LCAIRequest):
             "form_save_status": result.get("form_save_status"),
             "form_save_msg": result.get("form_save_msg"),
             "modify_history": result.get("form_modify_history"),
-            "conversation": [msg for msg in result.get("messages", []) if msg.get("role") in ["user", "assistant"]]
+            "conversation": conversation,
+            "meta": request.meta.model_dump()
         }
 
         return LCAIResponse(
             code=200,
             msg="success",
             data=response_data,
-            session_id=request.session_id
+            session_id=request.meta.chatId
         )
     except DSPlatformError as e:
         logger.error(f"DS平台调用失败：{str(e)}")
@@ -76,7 +91,7 @@ async def stream_lcai(request: LCAIRequest):
 
         # 构建初始状态
         initial_state = LCAIState(
-            session_id=request.session_id,
+            session_id=request.meta.chatId,
             user_input=request.user_input,
             messages=[{"role": "user", "content": request.user_input}]
         )
@@ -91,7 +106,7 @@ async def stream_lcai(request: LCAIRequest):
                         stream_chunk = LCAIStreamChunk(
                             chunk=last_msg.get("content", ""),
                             finished=False,
-                            session_id=request.session_id
+                            session_id=request.meta.chatId
                         )
                         yield f"data: {stream_chunk.model_dump_json(ensure_ascii=False)}\n\n"
 
@@ -99,7 +114,7 @@ async def stream_lcai(request: LCAIRequest):
             end_chunk = LCAIStreamChunk(
                 chunk="",
                 finished=True,
-                session_id=request.session_id
+                session_id=request.meta.chatId
             )
             yield f"data: {end_chunk.model_dump_json(ensure_ascii=False)}\n\n"
 
@@ -114,7 +129,7 @@ async def stream_lcai(request: LCAIRequest):
         error_chunk = LCAIStreamChunk(
             chunk=f"服务异常：{str(e)}",
             finished=True,
-            session_id=request.session_id
+            session_id=request.meta.chatId
         )
         return StreamingResponse(
             [f"data: {error_chunk.model_dump_json(ensure_ascii=False)}\n\n"],
