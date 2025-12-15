@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档">
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251212a 发现MessagesState类她妈是假的，就是个dict，得把graph&#10;层的所有state.xxx都改成dict的['key']；&#10;成功跑通了意图分析智能体芜湖！无敌！">
+      <change afterPath="$PROJECT_DIR$/app/tests/测试GraphViz渲染流程图.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/utils/renderProcess.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/agents/intent_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/intent_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/v1/lcai.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/v1/lcai.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/graph/lcai_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/graph/lcai_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/ds_platform.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/ds_platform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/state.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,8 +60,12 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.01-测试调用宝武DS单智能体.executor": "Run",
     "Python.02-测试调用宝武DS单智能体(多轮对话).executor": "Run",
+    "Python.lcai_draw_flowchart.executor": "Run",
+    "Python.lcai_graph.executor": "Run",
     "Python.main.executor": "Run",
     "Python.python app/main.py.executor": "Debug",
+    "Python.state.executor": "Debug",
+    "Python.测试GraphViz渲染流程图.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -86,11 +91,60 @@
       <recent name="D:\mycode\lcai\src\models" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\mycode\lcai\app\tests" />
       <recent name="D:\mycode\lcai\src" />
       <recent name="D:\mycode\lcai" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.lcai_graph">
+    <configuration name="测试GraphViz渲染流程图" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="lcai" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app/graph" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="D:\mycode\lcai\app\tests\测试GraphViz渲染流程图.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="lcai_graph" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="lcai" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app/graph" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/graph/lcai_graph.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="python app/main.py" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="lcai" />
       <option name="ENV_FILES" value="" />
@@ -115,9 +169,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="state" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="lcai" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app/models" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/models/state.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.lcai_graph" />
         <item itemvalue="Python.python app/main.py" />
+        <item itemvalue="Python.测试GraphViz渲染流程图" />
+        <item itemvalue="Python.state" />
       </list>
     </recent_temporary>
   </component>
@@ -139,7 +220,9 @@
       <workItem from="1765435816849" duration="8072000" />
       <workItem from="1765444370814" duration="666000" />
       <workItem from="1765500202172" duration="13640000" />
-      <workItem from="1765526095961" duration="5347000" />
+      <workItem from="1765526095961" duration="6278000" />
+      <workItem from="1765758896146" duration="11530000" />
+      <workItem from="1765775731107" duration="989000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -229,7 +312,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765526758495</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="dev251212a 发现MessagesState类她妈是假的，就是个dict，得把graph&#10;层的所有state.xxx都改成dict的['key']；&#10;成功跑通了意图分析智能体芜湖！无敌！">
+      <option name="closed" value="true" />
+      <created>1765531650162</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1765531650162</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,48 +340,47 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test101 新增一些测试，跑通了ds接口" />
     <MESSAGE value="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251212a 搭建了基于Uvicorn + FastAPI的服务引擎，搭建了基于LangGraph的低代码意图分析、问答、表单搭建智能体调度体系，补充开发文档" />
+    <MESSAGE value="dev251212a 发现MessagesState类她妈是假的，就是个dict，得把graph&#10;层的所有state.xxx都改成dict的['key']；&#10;成功跑通了意图分析智能体芜湖！无敌！" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251212a 发现MessagesState类她妈是假的，就是个dict，得把graph&#10;层的所有state.xxx都改成dict的['key']；&#10;成功跑通了意图分析智能体芜湖！无敌！" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/api/v1/lcai.py</url>
-          <line>34</line>
-          <option name="timeStamp" value="6" />
+          <line>51</line>
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="7" />
+          <url>file://$PROJECT_DIR$/app/api/v1/lcai.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/app/services/form_storage.py</url>
+          <line>43</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/services/ds_platform.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="14" />
+          <url>file://$PROJECT_DIR$/app/api/v1/lcai.py</url>
+          <line>42</line>
+          <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/services/ds_platform.py</url>
-          <line>60</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/services/ds_platform.py</url>
-          <line>54</line>
-          <option name="timeStamp" value="16" />
+          <url>file://$PROJECT_DIR$/app/api/v1/lcai.py</url>
+          <line>44</line>
+          <option name="timeStamp" value="43" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/lcai$lcai_graph.coverage" NAME="lcai_graph Coverage Results" MODIFIED="1765776588439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/graph" />
+    <SUITE FILE_PATH="coverage/lcai$lcai_draw_flowchart.coverage" NAME="测试GraphViz渲染流程图 Coverage Results" MODIFIED="1765776341085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/graph" />
     <SUITE FILE_PATH="coverage/lcai$02_DS__.coverage" NAME="02-测试调用宝武DS单智能体(多轮对话) Coverage Results" MODIFIED="1765515753898" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$01_DS.coverage" NAME="01-测试调用宝武DS单智能体 Coverage Results" MODIFIED="1765443025312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
-    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1765531004950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lcai$state.coverage" NAME="state Coverage Results" MODIFIED="1765765171708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/models" />
+    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1765776557847" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lcai$main.coverage" NAME="main Coverage Results" MODIFIED="1765437190173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>
