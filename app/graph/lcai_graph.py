@@ -1,7 +1,9 @@
 from langchain_core.messages import SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
-from typing import Dict, Any
+from typing import Dict, Any, AsyncGenerator
+
+from app.models.schema import LCAIStreamChunk
 from app.models.state import LCAIState
 from app.agents.intent_agent import intent_agent
 from app.agents.qa_agent import qa_agent
@@ -16,10 +18,6 @@ from app.utils.exceptions import IntentRecognitionError, FormStorageError
 # 1. 定义节点函数
 # ------------------------------
 async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
-    # 强制将字典转为LCAIState对象
-    # if isinstance(state, dict):
-    #     logger.warning("状态为字典，自动转换为LCAIState对象")
-    #     state = LCAIState(**state)
 
     """意图识别节点：判断用户意图类型"""
     try:
@@ -41,21 +39,32 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
         }
 
 
-async def qa_agent_node(state: LCAIState) -> Dict[str, Any]:
+async def qa_agent_node(state: LCAIState) -> AsyncGenerator[LCAIStreamChunk, None]:
     """低代码问答节点：处理问答类需求"""
     try:
-        response = await qa_agent.answer(state.user_input, stream=False)
-        return {
-            "finished": True,
-            "messages": add_messages(state.messages, [AIMessage(content=response["content"])])
-        }
+        # 调用问答智能体，获取流式生成器
+        qa_result = await qa_agent.answer(state.user_input, stream=True)
+        stream_generator = qa_result.get("stream")
+        answer = ""
+        if stream_generator:
+            # 逐段yield增量内容（核心：每一个chunk都实时返回）
+            async for chunk in stream_generator:
+                answer = answer + chunk
+                # print(f"DS返回：{chunk}")
+                yield  LCAIStreamChunk(
+                    node= "qa_agent",
+                    msg= answer,
+                    finished= True,
+                )
     except Exception as e:
-        logger.error(f"问答智能体节点失败：{str(e)}")
-        return {
-            "finished": True,
-            "messages": add_messages(state.messages,
-                                     [AIMessage(content=f"抱歉，无法解答您的问题：{str(e)}")])
-        }
+        logger.error(f"问答节点失败：{e}")
+        # 异常兜底yield
+        yield LCAIStreamChunk(
+            code=-1,
+            node="qa_agent",
+            msg=f"问答失败：{e}",
+            finished=True,
+        )
 
 
 async def form_build_node(state: LCAIState) -> Dict[str, Any]:
@@ -139,19 +148,43 @@ async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
 
 
 async def human_confirm_node(state: LCAIState) -> Dict[str, Any]:
-    """人在回路确认节点：判断用户是否需要继续修改"""
-    user_input = state.user_input.lower()
-    if "确认" in user_input or "满意" in user_input or "不需要" in user_input:
-        return {
-            "finished": True,
-            "human_confirm": True,
-            "messages": add_messages(state.messages, [AIMessage(content="表单搭建完成，感谢您的使用！")])
-        }
+    """人在回路确认节点：
+    1. 首次执行：暂停流程，等待用户输入“确认/修改”；
+    2. 恢复执行：执行原有逻辑，判断确认/修改并返回结果
+    """
+    # ========== 新增：判断是否是“恢复执行”（用户已输入确认/修改指令） ==========
+    if not state.paused:
+        # 场景1：恢复执行（用户已二次输入）→ 执行原有判断逻辑
+        user_input = state.user_input.lower()
+        if "确认" in user_input or "满意" in user_input or "不需要" in user_input:
+            return {
+                "finished": True,
+                "human_confirm": True,
+                "messages": add_messages(state.messages, [
+                    AIMessage(content="表单搭建完成，感谢您的使用！")
+                ])
+            }
+        else:
+            return {
+                "need_modify": True,
+                "messages": add_messages(state.messages, [
+                    SystemMessage(content="用户需要修改表单")
+                ])
+            }
+
+    # ========== 原有暂停逻辑：首次执行（用户未输入）→ 触发暂停 ==========
     else:
-        return {
-            "need_modify": True,
-            "messages": add_messages(state.messages, [SystemMessage(content="用户需要修改表单")])
+        # 场景2：首次执行 → 暂停流程，提示用户输入
+        update_dict = {
+            "paused": True,
+            "pause_at": "human_confirm",
+            "messages": add_messages(state.messages, [
+                AIMessage(content="请问您是否需要修改表单？如需修改请回复“修改”，无需修改请回复“确认”")
+            ])
         }
+        # 核心：返回__pause__标记，让LangGraph暂停流程
+        update_dict["__pause__"] = True
+        return update_dict
 
 
 # ------------------------------
@@ -199,7 +232,7 @@ def build_lcai_graph():
     """构建LCAI核心流程图"""
     graph = StateGraph(
         state_schema=LCAIState,  # 强制状态为LCAIState对象
-        validate=True  # 启用状态校验（可选，增强类型检查）
+        validate=False  # 启用状态校验（可选，增强类型检查）
     )
 
     # 添加节点

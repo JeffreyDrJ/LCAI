@@ -1,3 +1,4 @@
+from langchain_core.messages import BaseMessage
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict, Any, List
 
@@ -45,9 +46,12 @@ class LCAIResponse(BaseModel):
 
 # 流式响应模型
 class LCAIStreamChunk(BaseModel):
-    chunk: str = Field(..., description="流式返回片段")
+    # 主要
+    code: int = Field(default=0, description="状态码")
+    type: str = Field(default="message", description="返回信息")
+    node: str = Field(default="unknown", description="发消息的节点")
+    msg: str = Field(..., description="流式返回片段")
     finished: bool = Field(default=False, description="是否结束")
-    session_id: str = Field(..., description="会话ID")
 
 
 # 表单结构模型
