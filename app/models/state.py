@@ -1,6 +1,6 @@
 # app/models/state.py
 from pydantic import BaseModel, Field
-from typing import Optional, Literal, List
+from typing import Optional, Literal, List, Any
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage  # 标准消息类型
 from app.models.schema import FormSchema  # 你的表单Schema类
 
@@ -15,14 +15,22 @@ class LCAIState(BaseLCAIState):
     # 意图识别结果
     intent_type: Optional[Literal["qa", "form_build", "unknown"]] = Field(default=None,description="意图类型：问答/表单搭建/未知")
     intent_desc: Optional[str] = Field(default=None, description="意图描述")
-
+    # 回答相关数据
+    code: int = Field(default=0, description="状态码")
+    type: str = Field(default="message", description="返回信息")
+    node: str = Field(default="unknown", description="发消息的节点")
+    msg: Optional[str] = Field(default=None, description="回答内容")
+    # 暂停相关数据
+    paused: bool = False  # 流程是否暂停
+    pause_at: Optional[str] = None  # 暂停的节点（如 "human_confirm"）
+    graph_checkpoint: Optional[Any] = None  # LangGraph流程断点
     # 表单相关数据
     form_schema: Optional[FormSchema] = Field(default=None, description="表单结构")
     form_save_status: Optional[Literal["success", "failed"]] = Field(default=None, description="表单保存状态")
     form_save_msg: Optional[str] = Field(default=None, description="表单保存提示")
     form_modify_history: List[str] = Field(default=[], description="表单修改历史")
 
-    # 流程控制
+    # 表单多轮修改控制
     need_modify: bool = Field(default=False, description="是否需要修改表单")
     finished: bool = Field(default=False, description="流程是否结束")
     human_confirm: bool = Field(default=False, description="用户是否确认完成")

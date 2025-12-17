@@ -1,5 +1,6 @@
 import httpx
-from typing import Dict, Any, Optional
+import json
+from typing import Dict, Any, Optional, AsyncGenerator
 from app.config.settings import settings
 from app.utils.logger import logger
 from app.utils.exceptions import DSPlatformError
@@ -10,8 +11,35 @@ class DSPlatformClient:
 
     def __init__(self):
         self.base_url = settings.DS_BASE_URL
-        self.timeout = 60
+        self.timeout = 120  # 流式超时延长
         self.client = httpx.AsyncClient(timeout=self.timeout)
+
+    async def _parse_stream_chunk(self, chunk: str) -> AsyncGenerator[str, None]:
+        """解析DS平台流式chunk，仅返回增量content"""
+        try:
+            # 按换行符分割chunk，处理多行情况
+            lines = chunk.strip().split("\n")
+            for line in lines:
+                line = line.strip()
+                if not line or not line.startswith("data:"):
+                    continue
+
+                # 提取JSON部分
+                json_str = line.lstrip("data:").strip()
+                if json_str == "[DONE]":
+                    continue
+
+                # 解析单个JSON片段（此时是单行，无多段问题）
+                data = json.loads(json_str)
+                # 提取增量content（兼容content为null的情况）
+                delta_content = data.get("choices", [{}])[0].get("delta", {}).get("content")
+                if delta_content is not None and delta_content != "":
+                    yield delta_content
+
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON解析失败：{e}，原始行：{line[:200]}")
+        except Exception as e:
+            logger.error(f"解析流式chunk失败：{e}")
 
     async def call_llm(
             self,
@@ -51,11 +79,13 @@ class DSPlatformClient:
             response.raise_for_status()
 
             if stream:
-                # 流式响应返回生成器
-                async def stream_generator():
-                    async for chunk in response.aiter_text():
-                        yield chunk
-
+                # 流式响应返回生成器（处理多行chunk）
+                async def stream_generator() -> AsyncGenerator[str, None]:
+                    async for raw_chunk in response.aiter_text():
+                        # 调用修复后的解析方法，逐段返回content
+                        async for content in self._parse_stream_chunk(raw_chunk):
+                            # print(f"DS流式返回:{content}")
+                            yield content  # 仅返回有效增量内容
                 return {"stream": stream_generator()}
             else:
                 result = response.json()
