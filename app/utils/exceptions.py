@@ -30,6 +30,12 @@ class IntentRecognitionError(Exception):
         self.message = message
         super().__init__(self.message)
 
+class AppnameRecognitionError(Exception):
+    """意图识别异常"""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class AppTemplateApiError(BaseLCAIException):
     """应用模板查询API异常（S_BE_LA_18接口调用专用）"""
 
@@ -47,3 +53,9 @@ class AppTemplateApiError(BaseLCAIException):
         if self.request_id:
             base_str += f" | 请求ID：{self.request_id}"
         return base_str
+
+class AppGenerateError(Exception):
+    """应用生成异常"""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
