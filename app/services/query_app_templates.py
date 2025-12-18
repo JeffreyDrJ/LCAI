@@ -11,7 +11,7 @@ APP_TEMPLATE_API_URL = "https://eplatdev.baocloud.cn/code-admin/service/S_BE_LA_
 API_TIMEOUT = 60  # 超时时间（秒）
 
 
-async def call_app_template_api(name_clues, origin: str, meta: Dict) -> Dict:
+async def call_app_template_query(name_clues, meta: Dict) -> Dict:
     """
     调用应用模板查询API（S_BE_LA_18）
     :param user_input: 用户表单搭建需求（如“设备报修表单”）
@@ -21,18 +21,15 @@ async def call_app_template_api(name_clues, origin: str, meta: Dict) -> Dict:
     try:
         # 构造POST请求参数（根据第三方API要求调整，这里假设需要userInput和meta信息）
         request_body = {
-            "userInput": name_clues,
-            "meta": {
-                "userId": meta.get("userId"),
-                "origin": meta.get("origin"),
-                "cur_workspaceId": meta.get("cur_workspaceId"),
-                "cur_appId": meta.get("cur_appId")
-            }
+            "searchInfos": name_clues,
+            "userId": meta.userId,
+            "lcUserName": meta.lcUserName,
+            "returnLowcodeConfig": False,
         }
 
         # 发送POST请求（同步请求，若需异步可改用aiohttp）
         response = requests.post(
-            url=APP_TEMPLATE_API_URL.replace("https://eplatdev.baocloud.cn", origin),
+            url=APP_TEMPLATE_API_URL.replace("https://eplatdev.baocloud.cn", meta.origin),
             json=request_body,
             timeout=API_TIMEOUT,
             headers={"Content-Type": "application/json"}
@@ -40,10 +37,9 @@ async def call_app_template_api(name_clues, origin: str, meta: Dict) -> Dict:
 
         # 解析响应（假设API返回格式：{"code":0,"msg":"success","result":[]}）
         response_data = response.json()
-        if response.status_code != 200 or response_data.get("code") != 0:
-            raise AppTemplateApiError(f"API调用失败：{response_data.get('msg', '未知错误')}")
-
-        logger.info(f"应用模板API查询成功，返回模板数量：{len(response_data.get('result', []))}")
+        if response_data.get("__sys__").get("status") < 0:
+            raise AppTemplateApiError(f"API调用失败：{response_data.get("__sys__").get("msg")}")
+        logger.info(f"应用模板API：S_BE_LA_18 查询成功，返回模板数量：{len(response_data.get('result', []))}")
         return response_data
 
     except requests.exceptions.Timeout:

@@ -2,9 +2,10 @@ import time
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Body
 from fastapi.responses import StreamingResponse
-from typing import Generator, Dict, Any
+from typing import Generator, Dict, Any, AsyncGenerator
 import json
 from langchain_core.messages import HumanMessage, BaseMessage
+from langgraph.types import Command
 
 from app.models.schema import LCAIRequest, LCAIResponse, LCAIStreamChunk, LCAIMeta
 from app.models.state import LCAIState
@@ -96,31 +97,49 @@ async def stream_lcai(request: LCAIRequest):
         initial_state = LCAIState(
             session_id=request.meta.chatId,
             user_input=request.user_input,
+            meta=request.meta,
             messages=[HumanMessage(content=request.user_input)]
         )
 
-        # 生成流式响应
-        async def stream_generator() -> Generator[str, None, None]:
-            async for chunk in lcai_graph.astream(initial_state, stream_mode="updates"):
-                # 检查是否触发暂停
-                if chunk.get("paused") and chunk.get("pause_at") == "human_confirm":
-                    # 保存暂停状态到内存（无需Redis）
-                    save_paused_state(
-                        session_id=request.meta.chatId,
-                        state=LCAIState(**chunk),
-                        checkpoint=chunk.get("graph_checkpoint")  # LangGraph断点
-                    )
-                for node_name, node_data in chunk.items():
-                    if "messages" in node_data:
-                        del node_data["messages"]
-                    node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
-                    print(f'会话{initial_state.session_id}|| 节点【{node_name}】输出:{node_data}')
-                    # 流式返回消息内容（增量内容）
-                    yield json.dumps(
-                        node_data,
-                        ensure_ascii=False  # 核心参数：禁用ASCII转义
-                    )
+        # 设置会话
+        thread = {"configurable": {"thread_id": request.meta.chatId}}
 
+        # 生成流式响应
+        async def stream_generator() -> AsyncGenerator[str, None]:
+            # 运行图形直到遇到中断
+            async for chunk in lcai_graph.astream(initial_state, config=thread, stream_mode="updates"):
+                for node_name, node_data in chunk.items():
+                    if node_name == "__interrupt__":
+                        # 中断节点的node_data是tuple，需要特殊处理
+                        for interrupt in node_data["node_data"]:
+                            data = interrupt.value
+                            interrupt_info = {
+                                "type": "interrupt",
+                                "node": "__interrupt__",
+                                "time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                                "pause_info": {
+                                    "session_id": request.meta.chatId,
+                                    "pause_at": data["pause_at"],
+                                    "message": data["question"],
+                                    "sysMsg":"流程已暂停，请通过 /lcai/confirm 接口继续"
+                                },
+                                "finished": False
+                            }
+                            print(f'会话{initial_state.session_id}|| 遇到中断节点【{data["pause_at"]},等待用户响应中...】')
+                            yield json.dumps(interrupt_info, ensure_ascii=False) + "\n\n"
+                    else:
+                        if "messages" in node_data:
+                            del node_data["messages"]
+                        # node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
+                        print(f'会话{initial_state.session_id}|| 节点【{node_name}】输出:{node_data}')
+                        # 流式返回消息内容（增量内容）
+                        yield json.dumps(
+                            node_data,
+                            ensure_ascii=False  # 核心参数：禁用ASCII转义
+                        )
+
+            # async for chunk in lcai_graph.astream(initial_state, config=thread, stream_mode="values"):
+            #     print(chunk)
             # 发送结束标识
             end_chunk = {
                 "type": "end",
@@ -150,47 +169,87 @@ async def stream_lcai(request: LCAIRequest):
             media_type="text/event-stream"
         )
 
-# 2. 二次请求：用户确认/修改（恢复流程）
-@router.post("/lcai/confirm")
-async def confirm_form(
+
+# 二次调用接口：用户确认/继续
+@router.post("/confirm")
+async def confirm_lcai(
         session_id: str = Body(..., embed=True),  # 会话ID（和首次请求一致）
-        user_input: str = Body(..., embed=True)  # 用户输入：确认/修改
+        user_input: str = Body(..., embed=True)  # 用户输入："是"表示继续
 ):
+    """
+    二次调用LCAI智能体 - 处理用户确认
+    :param session_id: 会话ID
+    :param user_input: 用户输入（"是"表示继续执行）
+    :return: 流式响应结果
+    """
     try:
-        # 从内存加载暂停的状态和断点
-        paused_state, checkpoint = load_paused_state(session_id)
-        if not paused_state:
-            return {
-                "code": -1,
-                "message": "会话已过期或不存在，请重新发起表单搭建请求"
+        logger.info(f"二次调用LCAI: session_id={session_id}, user_input={user_input}")
+
+        # 构建继续执行的配置
+        config = {
+            "configurable": {"thread_id": session_id},
+        }
+
+        # 构建新的状态（包含用户的确认输入）
+        new_state = {
+            "user_input": user_input,
+            "paused": False
+        }
+
+        # 生成流式响应
+        async def stream_generator() -> AsyncGenerator[str, None]:
+            # 从检查点恢复执行
+            async for chunk in lcai_graph.astream(Command(resume=user_input), config=config, stream_mode="updates"):
+                for node_name, node_data in chunk.items():
+                    if node_name == "__interrupt__":
+                        # 中断节点的node_data是tuple，需要特殊处理
+                        interrupt_info = {
+                            "type": "interrupt",
+                            "node": "__interrupt__",
+                            "time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                            "pause_info": {
+                                "session_id": session_id,
+                                "message": "流程已暂停，请通过 /lcai/confirm 接口继续"
+                            },
+                            "finished": False
+                        }
+                        print(f'会话{session_id}|| 遇到中断节点【{node_name}】')
+                        yield json.dumps(interrupt_info, ensure_ascii=False) + "\n\n"
+                    else:
+                        if "messages" in node_data:
+                            del node_data["messages"]
+                        # node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
+                        print(f'会话{session_id}|| 节点【{node_name}】输出:{node_data}')
+                        # 流式返回消息内容（增量内容）
+                        yield json.dumps(
+                            node_data,
+                            ensure_ascii=False  # 核心参数：禁用ASCII转义
+                        )
+            # 发送结束标识
+            end_chunk = {
+                "type": "end",
+                "msg": "",
+                "finished": True
             }
-
-        # 更新状态：传入用户新输入，取消暂停
-        paused_state.user_input = user_input
-        paused_state.paused = False
-        paused_state.need_modify = True if user_input.lower() in ["修改", "否"] else False
-
-        # 恢复流程执行
-        async def stream_generator():
-            async for chunk in lcai_graph.astream(
-                    input=paused_state,
-                    config={"checkpoint": checkpoint},  # 从断点恢复
-                    stream_mode="values"
-            ):
-                if chunk.get("finished"):
-                    # 流程完成，清理内存缓存
-                    delete_paused_state(session_id)
-                yield f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n"
+            yield json.dumps(
+                end_chunk,
+                ensure_ascii=False  # 核心参数：禁用ASCII转义
+            )
 
         return StreamingResponse(
             stream_generator(),
             media_type="text/event-stream",
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
         )
-
     except Exception as e:
-        logger.error(f"二次请求失败：{str(e)}", exc_info=True)
-        return {
-            "code": -1,
-            "message": f"确认失败：{str(e)}"
-        }
+        logger.error(f"LCAI流式调用失败：{str(e)}", exc_info=True)
+        # 发送错误流
+        error_chunk = LCAIStreamChunk(
+            msg=f"服务异常：{str(e)}",
+            finished=True,
+            session_id=session_id
+        )
+        return StreamingResponse(
+            [f"data: {error_chunk.model_dump_json(ensure_ascii=False)}\n\n"],
+            media_type="text/event-stream"
+        )

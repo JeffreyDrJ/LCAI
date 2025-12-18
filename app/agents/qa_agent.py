@@ -12,7 +12,7 @@ class QAAgent:
     """
 
     @classmethod
-    async def answer(cls, user_input: str, stream: bool = False) -> dict:
+    async def answer(cls, chatId: str, user_input: str, stream: bool = False) -> dict:
         """
         回答用户的低代码平台使用问题
         :param user_input: 用户问题
@@ -24,6 +24,7 @@ class QAAgent:
         logger.info(f"低代码问答智能体处理请求：{user_input[:50]}...")
         response = await ds_client.call_llm(
             api_key=settings.DS_API_KEY_QA,
+            chatId=chatId,
             prompt=prompt,
             stream=stream,
             temperature=0.3

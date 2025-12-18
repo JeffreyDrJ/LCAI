@@ -4,17 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251216a 初步实现流式传输，正在开发人在回路">
-      <change afterPath="$PROJECT_DIR$/app/services/query_app_templates.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/state_persistence.py" afterDir="false" />
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <change afterPath="$PROJECT_DIR$/app/agents/app_create_agent.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/agents/app_template_query_agent.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/agents/appname_extract_agent.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/agents/planner_agent.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/services/generate_new_app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agents/intent_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/intent_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agents/qa_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/qa_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/api/v1/lcai.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/v1/lcai.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/graph/lcai_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/graph/lcai_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/state.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/ds_platform.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/ds_platform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/query_app_templates.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/query_app_templates.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/utils/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/exceptions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/项目搭建启动提示词.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/项目搭建启动提示词.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,41 +60,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.01-测试调用宝武DS单智能体.executor&quot;: &quot;Run&quot;,
-    &quot;Python.02-测试调用宝武DS单智能体(多轮对话).executor&quot;: &quot;Run&quot;,
-    &quot;Python.lcai_draw_flowchart.executor&quot;: &quot;Run&quot;,
-    &quot;Python.lcai_graph.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.python app/main.py.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.state.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.测试GraphViz渲染流程图.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/dev251212a&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/mycode/lcai/src/tests&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.01-测试调用宝武DS单智能体.executor": "Run",
+    "Python.02-测试调用宝武DS单智能体(多轮对话).executor": "Run",
+    "Python.human_test.executor": "Debug",
+    "Python.lcai_draw_flowchart.executor": "Run",
+    "Python.lcai_graph.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.python app/main.py.executor": "Debug",
+    "Python.state.executor": "Debug",
+    "Python.测试GraphViz渲染流程图.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "feature/dev251212a",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/mycode/lcai/app/agents",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\mycode\lcai\app\agents" />
       <recent name="D:\mycode\lcai\src\tests" />
       <recent name="D:\mycode\lcai\docs" />
       <recent name="D:\mycode\lcai\src\utils" />
       <recent name="D:\mycode\lcai\src\services" />
-      <recent name="D:\mycode\lcai\src\models" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\mycode\lcai\app\tests" />
@@ -226,6 +231,8 @@
       <workItem from="1765758896146" duration="11530000" />
       <workItem from="1765775731107" duration="13036000" />
       <workItem from="1765845847891" duration="26644000" />
+      <workItem from="1765932106425" duration="38100000" />
+      <workItem from="1766038272396" duration="8515000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -371,7 +378,63 @@
       <option name="project" value="LOCAL" />
       <updated>1765875967446</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="dev251216a 初步实现流式传输，正在开发人在回路">
+      <option name="closed" value="true" />
+      <created>1765932132358</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1765932132358</updated>
+    </task>
+    <task id="LOCAL-00020" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046448793</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046448793</updated>
+    </task>
+    <task id="LOCAL-00021" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046497615</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046497615</updated>
+    </task>
+    <task id="LOCAL-00022" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046592563</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046592563</updated>
+    </task>
+    <task id="LOCAL-00023" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046661800</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046661800</updated>
+    </task>
+    <task id="LOCAL-00024" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046820119</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046820119</updated>
+    </task>
+    <task id="LOCAL-00025" summary="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
+      <option name="closed" value="true" />
+      <created>1766046888667</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1766046888667</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -395,7 +458,8 @@
     <MESSAGE value="dev251215a 修复LCAIState解释为dict的问题，现在为Pydantic" />
     <MESSAGE value="dev251215a 初步实现流式传输，正在开发人在回路" />
     <MESSAGE value="dev251216a 初步实现流式传输，正在开发人在回路" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251216a 初步实现流式传输，正在开发人在回路" />
+    <MESSAGE value="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -407,19 +471,57 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>80</line>
-          <option name="timeStamp" value="76" />
+          <line>207</line>
+          <option name="timeStamp" value="124" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>176</line>
+          <option name="timeStamp" value="126" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/app_create_agent.py</url>
+          <line>30</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/app_create_agent.py</url>
+          <line>34</line>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>120</line>
+          <option name="timeStamp" value="129" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>122</line>
+          <option name="timeStamp" value="130" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/api/v1/lcai.py</url>
+          <line>122</line>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/lcai$lcai_graph.coverage" NAME="lcai_graph Coverage Results" MODIFIED="1765776588439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/graph" />
+    <SUITE FILE_PATH="coverage/lcai$human_test.coverage" NAME="human_test Coverage Results" MODIFIED="1765936127613" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/graph" />
     <SUITE FILE_PATH="coverage/lcai$lcai_draw_flowchart.coverage" NAME="测试GraphViz渲染流程图 Coverage Results" MODIFIED="1765776341085" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/graph" />
     <SUITE FILE_PATH="coverage/lcai$02_DS__.coverage" NAME="02-测试调用宝武DS单智能体(多轮对话) Coverage Results" MODIFIED="1765515753898" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$01_DS.coverage" NAME="01-测试调用宝武DS单智能体 Coverage Results" MODIFIED="1765443025312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$state.coverage" NAME="state Coverage Results" MODIFIED="1765765171708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/models" />
-    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1765871930304" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1766047185844" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lcai$main.coverage" NAME="main Coverage Results" MODIFIED="1765437190173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

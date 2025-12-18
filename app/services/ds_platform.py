@@ -44,6 +44,7 @@ class DSPlatformClient:
     async def call_llm(
             self,
             api_key: str,
+            chatId: str,
             prompt: str,
             stream: bool = False,
             temperature: float = 0.1
@@ -66,11 +67,12 @@ class DSPlatformClient:
             "model": settings.DS_MODEL_NAME,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": temperature,
-            "stream": stream
+            "stream": stream,
+            "chatId": chatId
         }
 
         try:
-            logger.info(f"调用DS平台LLM：model={settings.DS_MODEL_NAME}, stream={stream}")
+            # logger.info(f"调用DS平台LLM：model={settings.DS_MODEL_NAME}, stream={stream}")
             response = await self.client.post(
                 url=self.base_url + "/chat/completions",
                 headers=headers,
