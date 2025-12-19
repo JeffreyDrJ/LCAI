@@ -4,26 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）">
-      <change afterPath="$PROJECT_DIR$/app/services/generate_new_form.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/form/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/form/form_generate_util.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/message/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/message/message_manage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251219a 完成表单搭建智能体">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/agents/app_create_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/app_create_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/agents/app_template_query_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/app_template_query_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/agents/form_build_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/form_build_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/agents/planner_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/planner_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/v1/lcai.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/v1/lcai.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/graph/lcai_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/graph/lcai_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/state.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/query_app_templates.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/query_app_templates.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/utils/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/exceptions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -264,7 +247,7 @@
       <workItem from="1765845847891" duration="26644000" />
       <workItem from="1765932106425" duration="38100000" />
       <workItem from="1766038272396" duration="9169000" />
-      <workItem from="1766106450687" duration="17492000" />
+      <workItem from="1766106450687" duration="18517000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -482,7 +465,31 @@
       <option name="project" value="LOCAL" />
       <updated>1766047450296</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="dev251219a 完成表单搭建智能体">
+      <option name="closed" value="true" />
+      <created>1766131974875</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1766131974875</updated>
+    </task>
+    <task id="LOCAL-00029" summary="dev251219a 完成表单搭建智能体">
+      <option name="closed" value="true" />
+      <created>1766132032680</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1766132032680</updated>
+    </task>
+    <task id="LOCAL-00030" summary="dev251219a 完成表单搭建智能体">
+      <option name="closed" value="true" />
+      <created>1766132136825</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1766132136825</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -507,7 +514,8 @@
     <MESSAGE value="dev251215a 初步实现流式传输，正在开发人在回路" />
     <MESSAGE value="dev251216a 初步实现流式传输，正在开发人在回路" />
     <MESSAGE value="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）" />
+    <MESSAGE value="dev251219a 完成表单搭建智能体" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251219a 完成表单搭建智能体" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -518,29 +526,14 @@
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_build_agent.py</url>
-          <line>98</line>
-          <option name="timeStamp" value="147" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>145</line>
+          <line>147</line>
           <option name="timeStamp" value="148" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_build_agent.py</url>
-          <line>95</line>
-          <option name="timeStamp" value="152" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/utils/message/message_manage.py</url>
           <line>6</line>
           <option name="timeStamp" value="153" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_build_agent.py</url>
-          <line>105</line>
-          <option name="timeStamp" value="154" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/services/generate_new_form.py</url>
