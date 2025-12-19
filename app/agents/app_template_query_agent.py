@@ -70,7 +70,8 @@ class ApptemplateQueryAgent:
         # 2.查询应用模板
         try:
             response = await query_app_templates.call_app_template_query(
-                name_clues=keys,
+                # name_clues=keys,
+                name_clues=appName,
                 meta=meta
             )
             app_templates = response["result"]

@@ -5,6 +5,8 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from typing import Dict, Any, AsyncGenerator
 
+from requests_toolbelt import user_agent
+
 from app.models.state import LCAIState
 
 from app.agents.intent_agent import intent_agent
@@ -12,9 +14,10 @@ from app.agents.qa_agent import qa_agent
 from app.agents.appname_extract_agent import app_name_extract_agent
 from app.agents.app_template_query_agent import app_template_query_agent
 from app.agents.app_create_agent import app_create_agent
+from app.agents.form_build_agent import form_build_agent
 
 from app.utils.logger import logger
-from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError
+from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError, AppGenerateError
 from langgraph.types import interrupt, Command
 from langgraph.types import Command
 
@@ -121,18 +124,40 @@ async def app_create_node(state: LCAIState) -> Dict[str, Any]:
         app_info = await app_create_agent.create_app(appName=state.app_name, meta=state.meta)
         # 组织返回消息
         return {
-            "app_id": app_info.app_id,
-            "messages": add_messages(state.messages, [SystemMessage(content=f"应用创建成功:{app_info.app_name}")]),
+            "app_id": app_info["app_id"],
+            "app_name": app_info["app_name"],
+            "messages": add_messages(state.messages, [SystemMessage(content=f"应用创建成功:[{app_info["app_name"]}]")]),
             "msg": ""
         }
-    except AppnameRecognitionError as e:
-        logger.error(f"应用名提取节点失败：{str(e)}")
+    except AppGenerateError as e:
+        logger.error(f"应用创建失败：{str(e)}")
         return {
             "app_name": "unknown",
-            "desc": f"意图识别失败：{str(e)}",
+            "desc": f"应用创建失败：{str(e)}",
             "finished": True,
-            "messages": add_messages(state.messages,
-                                     [AIMessage(content=f"应用名提取节点失败：{str(e)}")])
+            "messages": add_messages(state.messages,[AIMessage(content=f"应用创建失败：{str(e)}")])
+        }
+
+async def form_build_node(state: LCAIState) -> Dict[str, Any]:
+    """创建一个新的表单"""
+    try:
+        model_info = await form_build_agent.build_form(state=state, form_name="",form_prompt="")
+        # 组织返回消息
+        model_id = model_info["model_id"]
+        form_name = model_info["form_name"]
+        return {
+            "model_id": model_id,
+            "form_name": form_name,
+            "messages": add_messages(state.messages, [SystemMessage(content=f"表单创建成功:[{form_name}]")]),
+            "msg": f"表单【{form_name}({model_id})】创建成功！"
+        }
+    except AppGenerateError as e:
+        logger.error(f"应用创建失败：{str(e)}")
+        return {
+            "app_name": "unknown",
+            "desc": f"应用创建失败：{str(e)}",
+            "finished": True,
+            "messages": add_messages(state.messages,[AIMessage(content=f"应用创建失败：{str(e)}")])
         }
 
 
@@ -224,6 +249,7 @@ def build_lcai_graph():
     graph.add_node("app_name_extract", appname_extract_node)
     graph.add_node("app_template_query", app_template_query_node)
     graph.add_node("app_create", app_create_node)
+    graph.add_node("form_build", form_build_node)
     graph.add_node("human_confirm", human_node)
 
     # 设置入口节点
@@ -237,7 +263,6 @@ def build_lcai_graph():
         {
             "qa_agent": "qa_agent",
             "app_build": "app_name_extract",
-            "human_confirm": "human_confirm",
             END: END
         }
     )
@@ -247,6 +272,9 @@ def build_lcai_graph():
 
     # 添加分支边 - 提取应用名称
     graph.add_edge("app_name_extract", "app_template_query")
+
+    # 添加分支边 - 提取应用名称
+    graph.add_edge("app_create", "form_build")
 
     # 添加分支边 - 查询应用模板
     graph.add_conditional_edges(
@@ -265,7 +293,7 @@ def build_lcai_graph():
         {
             "intent_recognition": "intent_recognition",
             "app_create": "app_create",
-            "": "app_create",
+            # "": "app_create",
             END: END
         }
     )

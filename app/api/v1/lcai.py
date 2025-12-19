@@ -111,7 +111,7 @@ async def stream_lcai(request: LCAIRequest):
                 for node_name, node_data in chunk.items():
                     if node_name == "__interrupt__":
                         # 中断节点的node_data是tuple，需要特殊处理
-                        for interrupt in node_data["node_data"]:
+                        for interrupt in node_data:
                             data = interrupt.value
                             interrupt_info = {
                                 "type": "interrupt",
