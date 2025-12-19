@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251219a 完成表单搭建智能体">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251219b 移除敏感文件追踪" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -247,7 +244,7 @@
       <workItem from="1765845847891" duration="26644000" />
       <workItem from="1765932106425" duration="38100000" />
       <workItem from="1766038272396" duration="9169000" />
-      <workItem from="1766106450687" duration="18517000" />
+      <workItem from="1766106450687" duration="18891000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -489,7 +486,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766132136825</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="dev251219b 移除敏感文件追踪">
+      <option name="closed" value="true" />
+      <created>1766132817192</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1766132817192</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -515,7 +520,8 @@
     <MESSAGE value="dev251216a 初步实现流式传输，正在开发人在回路" />
     <MESSAGE value="dev251218a 实现人在回路中，以及应用搭建场景复刻（完成一半）" />
     <MESSAGE value="dev251219a 完成表单搭建智能体" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251219a 完成表单搭建智能体" />
+    <MESSAGE value="dev251219b 移除敏感文件追踪" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251219b 移除敏感文件追踪" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
