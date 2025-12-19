@@ -16,6 +16,7 @@ class Settings(BaseConfig):
     DS_API_KEY_QA: str = os.getenv("DS_API_KEY_QA")
     DS_API_KEY_FORM_BUILD: str = os.getenv("DS_API_KEY_FORM_BUILD")
     DS_API_KEY_FORM_MODIFY: str = os.getenv("DS_API_KEY_FORM_MODIFY")
+    DS_API_KEY_GENERAL_USE: str = os.getenv("API_KEY_GENERAL_USE")
     DS_MODEL_NAME: str = os.getenv("DS_MODEL_NAME", "qwen-plus")
 
     # 第三方表单保存API

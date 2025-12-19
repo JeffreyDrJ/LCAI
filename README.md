@@ -16,7 +16,7 @@
 - 健康检查： <http://localhost:8000/health>
 
 ## 4.示例请求
-***POST:*** <http://localhost:8000/api/v1/lcai/invoke>
+***POST:*** <http://localhost:8000/api/v1/lcai/stream>
 ```json
 {
     "user_input": "低代码平台有哪些功能？",
@@ -27,5 +27,12 @@
         "origin":"https://eplatdev.baocloud.cn"
     },
     "stream": false
+}
+```
+***POST:*** <http://localhost:8000/api/v1/lcai/confirm>
+```json
+{
+    "user_input": "2",
+    "session_id":"a0-123"
 }
 ```

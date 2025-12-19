@@ -35,7 +35,7 @@ class PlannerAgent:
         :param stream: 是否流式响应
         :return: 回答结果
         """
-        prompt = cls.QA_PROMPT_TEMPLATE.format(user_input=user_input)
+        prompt = cls.PLANNER_PROMPT_TEMPLATE.format(user_input=user_input)
 
         logger.info(f"低代码规划智能体处理请求：{user_input[:50]}...")
         response = await ds_client.call_llm(
@@ -50,4 +50,4 @@ class PlannerAgent:
 
 
 # 全局实例
-qa_agent = QAAgent()
+planner_agent = PlannerAgent()

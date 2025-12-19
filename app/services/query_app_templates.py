@@ -21,7 +21,8 @@ async def call_app_template_query(name_clues, meta: Dict) -> Dict:
     try:
         # 构造POST请求参数（根据第三方API要求调整，这里假设需要userInput和meta信息）
         request_body = {
-            "searchInfos": name_clues,
+            # "searchInfos": name_clues,
+            "searchInfo": name_clues,
             "userId": meta.userId,
             "lcUserName": meta.lcUserName,
             "returnLowcodeConfig": False,
