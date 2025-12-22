@@ -30,6 +30,12 @@ class IntentRecognitionError(Exception):
         self.message = message
         super().__init__(self.message)
 
+class PlanningError(Exception):
+    """任务规划异常"""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class AppnameRecognitionError(Exception):
     """意图识别异常"""
     def __init__(self, message: str):

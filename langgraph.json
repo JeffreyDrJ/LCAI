@@ -1,0 +1,10 @@
+
+{
+  "dependencies": [
+    "./"
+  ],
+  "graphs": {
+    "chatbot": "./graph/lcai_graph.py:graph"
+  },
+  "env": ".env"
+}
