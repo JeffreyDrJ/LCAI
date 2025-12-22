@@ -7,6 +7,7 @@ from typing import Dict, Any, AsyncGenerator
 
 from requests_toolbelt import user_agent
 
+from app.agents.planner_agent import planner_agent
 from app.models.state import LCAIState
 
 from app.agents.intent_agent import intent_agent
@@ -17,7 +18,7 @@ from app.agents.app_create_agent import app_create_agent
 from app.agents.form_build_agent import form_build_agent
 
 from app.utils.logger import logger
-from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError, AppGenerateError
+from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError, AppGenerateError, PlanningError
 from langgraph.types import interrupt, Command
 from langgraph.types import Command
 
@@ -42,7 +43,23 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
             "finished": True,
             "messages": add_messages(state.messages,
                                      [AIMessage(content=f"抱歉，无法识别您的需求：{str(e)}")])
-            # TODO 可默认转为调用问答智能体
+        }
+
+async def planner_node(state: LCAIState) -> Dict[str, Any]:
+    """任务规划节点：拆分复杂用户需求"""
+    try:
+        plan = await planner_agent.make_plan(user_input=state.user_input, chatId=state.session_id)
+        return {
+            "execution_plan": plan
+        }
+    except PlanningError as e:
+        logger.error(f"任务规划节点失败：{str(e)}")
+        return {
+            "execution_plan": [],
+            "intent_desc": f"任务规划失败：{str(e)}",
+            "finished": True,
+            "messages": add_messages(state.messages,
+                                     [AIMessage(content=f"抱歉，任务规划失败：{str(e)}")])
         }
 
 
@@ -245,6 +262,7 @@ def build_lcai_graph():
 
     ## 1/3 注册节点
     graph.add_node("intent_recognition", intent_recognition_node)
+    graph.add_node("planner_agent", planner_node)
     graph.add_node("qa_agent", qa_agent_node)
     graph.add_node("app_name_extract", appname_extract_node)
     graph.add_node("app_template_query", app_template_query_node)
@@ -263,6 +281,8 @@ def build_lcai_graph():
         {
             "qa_agent": "qa_agent",
             "app_build": "app_name_extract",
+            "complex": "planner_agent",
+            "unknown": "qa_agent",
             END: END
         }
     )
@@ -305,10 +325,10 @@ def build_lcai_graph():
     app = graph.compile(checkpointer=memory)
     logger.info("LCAI LangGraph流程编译完成")
     # 保存图片
-    graph_png = app.get_graph().draw_mermaid_png(max_retries=5, retry_delay=2.5)
-    with open("breakpoint.png", "wb") as f:
-        f.write(graph_png)
-        logger.info("流程图保存成功: breakpoint.png")
+    # graph_png = app.get_graph().draw_mermaid_png(max_retries=5, retry_delay=2.5)
+    # with open("breakpoint.png", "wb") as f:
+    #     f.write(graph_png)
+    #     logger.info("流程图保存成功: breakpoint.png")
 
     # 返回
     return app
