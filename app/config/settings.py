@@ -31,6 +31,9 @@ class Settings(BaseConfig):
     # 会话配置
     CONTEXT_EXPIRE_TIME: int = int(os.getenv("CONTEXT_EXPIRE_TIME", 3600))
 
+    # 逻辑配置
+    HUMAN_CONFIRM_PLAN: bool = False
+
     class Config:
         case_sensitive = True
 

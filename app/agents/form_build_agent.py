@@ -43,26 +43,37 @@ class FormBuildAgent:
         :return: 表单信息
         """
         # 0.入参初始化
-        form_name = form_name if form_name else state.app_name
-        form_prompt = form_prompt if form_prompt else state.user_input
+        if form_name == "":
+            if state.executing_plan and state.execution_plan[state.current_task_id - 1].task_input["form_name"]:
+                form_name = state.execution_plan[state.current_task_id - 1].task_input["form_name"]
+            else:
+                form_name = state.app_name
+        if form_prompt == "":
+            if state.executing_plan and state.execution_plan[state.current_task_id - 1].description:
+                form_prompt = state.execution_plan[state.current_task_id - 1].description
+            else:
+                form_prompt = state.user_input
 
         # 1.提取表单搭建需求中的字段要求：
-        extract_fr_prompt = cls.FORM_FIELD_REQUIREMENT_PROMPT_TEMPLATE.format(user_input=form_prompt)
-
-        logger.info(f"表单搭建智能体处理[表单字段要求提取]请求：{form_prompt[:50]}...")
-        try:
-            response = await ds_client.call_llm(
-                api_key=settings.DS_API_KEY_GENERAL_USE,
-                chatId=state.meta.chatId,
-                prompt=extract_fr_prompt,
-                stream=False,
-                temperature=0.1
-            )
-            field_requirements = response["content"].strip().lower()
-            logger.info(f"表单搭建智能体处理[表单字段要求提取]提取到字段要求：{field_requirements[:50]}...")
-        except Exception as e:
-            logger.error(f"表单字段要求提取提取失败：{str(e)}", exc_info=True)
-            raise FormBuildError(f"表单字段要求提取提取失败：{str(e)}")
+        if not state.executing_plan:
+            extract_fr_prompt = cls.FORM_FIELD_REQUIREMENT_PROMPT_TEMPLATE.format(user_input=form_prompt)
+            logger.info(f"表单搭建智能体处理[表单字段要求提取]请求：{form_prompt[:50]}...")
+            try:
+                response = await ds_client.call_llm(
+                    api_key=settings.DS_API_KEY_GENERAL_USE,
+                    chatId=state.meta.chatId,
+                    prompt=extract_fr_prompt,
+                    stream=False,
+                    temperature=0.1
+                )
+                field_requirements = response["content"].strip().lower()
+                logger.info(f"表单搭建智能体处理[表单字段要求提取]提取到字段要求：{field_requirements[:50]}...")
+            except Exception as e:
+                logger.error(f"表单字段要求提取提取失败：{str(e)}", exc_info=True)
+                raise FormBuildError(f"表单字段要求提取提取失败：{str(e)}")
+        else:
+            field_requirements = state.execution_plan[state.current_task_id - 1].task_input["field_requirements"]
+            logger.info(f"字段要求：{field_requirements[:50]}...")
         # 2.生成表单JSON：
         prompt = cls.FORM_JSON_BUILD_PROMPT_TEMPLATE.format(form_name=form_name, field_requirements=field_requirements)
 

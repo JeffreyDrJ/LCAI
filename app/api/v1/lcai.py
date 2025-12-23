@@ -130,6 +130,8 @@ async def stream_lcai(request: LCAIRequest):
                     else:
                         if "messages" in node_data:
                             del node_data["messages"]
+                        if "execution_plan" in node_data:
+                            del node_data["execution_plan"]
                         # node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
                         print(f'会话{initial_state.session_id}|| 节点【{node_name}】输出:{node_data}')
                         # 流式返回消息内容（增量内容）

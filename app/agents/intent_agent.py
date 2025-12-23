@@ -10,7 +10,7 @@ class IntentAgent:
 
     INTENT_PROMPT_TEMPLATE = """
     请分析用户输入的需求，判断其意图类型，仅返回以下选项中的一个，不需要带序号：
-    complex：用户需求较复杂，可拆分为多个子任务，如用户指定要创建多个应用、多个表单的情形
+    complex：用户需求较复杂，可拆分为多个子任务，如用户指定要创建多个应用、多个表单的情形，必然属于此类
     qa：低代码平台使用帮助、问答类需求
     app_build：搭建/修改低代码应用相关需求
     human_confirm: 人工确认节点，只有明确说明要人工确认才返回这个！
@@ -20,7 +20,7 @@ class IntentAgent:
     """
     #TODO 把提示词模板整合封装到LangchainTemplate里
     @classmethod
-    async def recognize_intent(cls, chatId, user_input: str) -> Literal["qa", "app_build", "unknown"]:
+    async def recognize_intent(cls, chatId, user_input: str) -> Literal["qa", "app_build", "complex", "unknown"]:
         """
         识别用户意图
         :param user_input: 用户输入
@@ -28,6 +28,9 @@ class IntentAgent:
         """
         prompt = cls.INTENT_PROMPT_TEMPLATE.format(user_input=user_input)
 
+        # 强制通过规划智能体
+        if "两个" in user_input or "然后" in user_input or ("先" in user_input and "后" in user_input):
+            return "complex"
         try:
             response = await ds_client.call_llm(
                 api_key=settings.DS_API_KEY_INTENT,
@@ -40,8 +43,6 @@ class IntentAgent:
             intent = response["content"].strip().lower()
             logger.info(f"意图识别结果：{intent}，用户输入：{user_input}")
 
-            if intent not in ["qa", "app_build", "human_confirm", "unknown"]:
-                raise IntentRecognitionError(f"无效的意图识别结果：{intent}")
 
             return intent
         except Exception as e:
