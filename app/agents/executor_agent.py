@@ -1,127 +1,155 @@
-from typing import Dict, Any, Optional
+# app/agents/executor_agent.py
+from typing import Optional, Dict, Any
+
+from langchain_core.messages import SystemMessage, AIMessage
+from langgraph.constants import END
+from langgraph.graph import add_messages
+
 from app.models.state import LCAIState, Task
 from app.utils.logger import logger
-import asyncio
 
 
 class ExecutorAgent:
     def __init__(self):
-        self.node_mapping = {
-            "app_name_extract": self._execute_app_name_extract,
-            "app_create": self._execute_app_create,
-            "form_build": self._execute_form_build
-        }
+        # 移除原有 node_mapping 和执行方法，仅保留任务管理逻辑
+        self.task_node_map = {
+            "app_name_extract": "app_name_extract",
+            "app_create": "app_create",
+            "form_build": "form_build",
+            "human_confirm": "human_confirm"
+        }  # 任务节点名与 LangGraph 节点名映射（确保一致性）
 
-    async def _execute_app_name_extract(self, state: LCAIState, task: Task) -> Dict[str, Any]:
-        """执行应用名提取任务"""
-        from app.agents.appname_extract_agent import app_name_extract_agent
-        try:
-            # 从任务描述中提取应用名称
-            app_name = "会议预定"  # 可通过NLP提取，此处简化
-            app_info = await app_name_extract_agent.create_app(appName=app_name, meta=state.meta)
-            return {
-                "task_status": "success",
-                "task_output": app_info,
-                "app_id": app_info["app_id"],
-                "app_name": app_info["app_name"]
-            }
-        except Exception as e:
-            logger.error(f"任务{task.task_id}执行失败：{str(e)}")
-            return {
-                "task_status": "failed",
-                "task_output": str(e)
-            }
-
-    async def _execute_app_create(self, state: LCAIState, task: Task) -> Dict[str, Any]:
-        """执行应用创建任务"""
-        from app.agents.app_create_agent import app_create_agent
-        try:
-            # 从任务描述中提取应用名称
-            app_name = "会议预定"  # 可通过NLP提取，此处简化
-            app_info = await app_create_agent.create_app(appName=app_name, meta=state.meta)
-            return {
-                "task_status": "success",
-                "task_output": app_info,
-                "app_id": app_info["app_id"],
-                "app_name": app_info["app_name"]
-            }
-        except Exception as e:
-            logger.error(f"任务{task.task_id}执行失败：{str(e)}")
-            return {
-                "task_status": "failed",
-                "task_output": str(e)
-            }
-
-    async def _execute_form_build(self, state: LCAIState, task: Task) -> Dict[str, Any]:
-        """执行表单创建任务"""
-        from app.agents.form_build_agent import form_build_agent
-        try:
-            # 从任务描述中提取表单名称和提示
-            form_name = task.description.split("「")[1].split("」")[0]
-            form_prompt = task.description
-            model_info = await form_build_agent.build_form(state=state, form_name=form_name, form_prompt=form_prompt)
-            return {
-                "task_status": "success",
-                "task_output": model_info,
-                "model_id": model_info["model_id"],
-                "form_name": model_info["form_name"]
-            }
-        except Exception as e:
-            logger.error(f"任务{task.task_id}执行失败：{str(e)}")
-            return {
-                "task_status": "failed",
-                "task_output": str(e)
-            }
-
-    async def execute_task_queue(self, state: LCAIState) -> LCAIState:
+    def get_next_pending_task(self, state: LCAIState) -> Optional[Task]:
         """
-        执行任务队列中的所有子任务
+        获取任务队列中第一个待执行的任务（pending 状态）
         """
-        state.executing_plan = True
-        task_list = state.execution_plan
-        total_tasks = len(task_list)
+        if not state.execution_plan:
+            logger.warning(f"会话{state.session_id}：任务队列为空")
+            return None
 
-        for idx, task in enumerate(task_list):
-            if task.status != "pending":
-                continue
+        # 按 task_id 升序排序，获取第一个 pending 任务
+        sorted_tasks = sorted(state.execution_plan, key=lambda t: t.task_id)
+        next_task = next((t for t in sorted_tasks if t.status == "pending"), None)
+        return next_task
 
-            # 更新当前任务ID与任务状态
-            state.current_task_id = task.task_id
-            task.status = "running"
-            logger.info(f"开始执行任务{task.task_id}/{total_tasks}：{task.description}")
+    def get_target_node(self, task: Task) -> str:
+        """
+        根据任务节点名，获取对应的 LangGraph 功能节点名
+        """
+        target_node = self.task_node_map.get(task.node_name, "")
+        if not target_node:
+            logger.error(f"未知任务节点名：{task.node_name}，无法匹配 LangGraph 节点")
+        return target_node
 
-            # 调度对应节点执行
-            if task.node_name not in self.node_mapping:
-                task.status = "failed"
-                task.output = f"未知节点名：{task.node_name}"
-                state.planner_feedback = f"任务{task.task_id}无法执行：未知节点"
-                continue
+    def update_task_status(self, state: LCAIState, task_id: int, status: str,
+                           output: Optional[Dict[str, Any]] = None) -> None:
+        """
+        更新指定任务的状态与执行结果
+        """
+        for task in state.execution_plan:
+            if task.task_id == task_id:
+                task.status = status
+                task.task_output = output
+                logger.info(f"会话{state.session_id}：任务{task_id}状态更新为「{status}」")
+                break
+        else:
+            logger.warning(f"会话{state.session_id}：未找到任务ID {task_id}，无法更新状态")
 
-            # 执行任务
-            task_result = await self.node_mapping[task.node_name](state, task)
+    def is_all_tasks_completed(self, state: LCAIState) -> bool:
+        """
+        判断任务队列是否全部执行完成（无 pending/running 任务）
+        """
+        if not state.execution_plan:
+            return True
+        return all(t.status in ["success", "failed", "need_human"] for t in state.execution_plan)
 
-            # 更新任务状态与输出
-            task.status = task_result["task_status"]
-            task.output = task_result["task_output"]
+    def validate_task(self, state: LCAIState) -> bool:
+        """
+        判断上一项任务是否成功：
+        """
+        node_name = state.execution_plan[int(state.current_task_id) - 1].node_name
+        if node_name == "app_name_extract":
+            return state.app_name != ""
+        elif node_name == "app_create":
+            return state.app_id != ""
+        elif node_name == "form_build":
+            return state.model_id != ""
+        else:
+            return True
 
-            # 将任务结果同步到全局状态
-            if task_result["task_status"] == "success":
-                for key, value in task_result.items():
-                    if key not in ["task_status", "task_output"]:
-                        setattr(state, key, value)
-                logger.info(f"任务{task.task_id}执行成功")
-            else:
-                state.planner_feedback = f"任务{task.task_id}执行失败：{task_result['task_output']}"
-                logger.error(f"任务{task.task_id}执行失败：{task_result['task_output']}")
-                # 可选：中断任务队列或继续执行后续任务
-                # break
+    async def execute_next_step(self, state: LCAIState) -> Dict[str, Any]:
+        """
+        准备下一步流程：获取下一个任务，返回跳转节点信息
+        """
+        try:
+            # 1. 判断是否所有任务已完成
+            if self.is_all_tasks_completed(state):
+                completed_count = len([t for t in state.execution_plan if t.status == "success"])
+                total_count = len(state.execution_plan)
+                feedback = f"任务队列执行完毕！共{total_count}个任务，成功{completed_count}个"
+                logger.info(f"会话{state.session_id}：{feedback}")
+                return {
+                    "executing_plan": False,
+                    "finished": True,
+                    "planner_feedback": feedback,
+                    "next_node": END,  # 所有任务完成，跳转至结束
+                    "messages": add_messages(state.messages, [SystemMessage(content=feedback)])
+                }
+            # 2. 更新上一项任务状态
+            if state.current_task_id != "" and state.current_task_id != None:
+                task_success = self.validate_task(state)
+                if task_success:
+                    self.update_task_status(state, state.current_task_id, "success")
 
-        # 所有任务执行完毕
-        state.executing_plan = False
-        state.finished = all(task.status in ["success", "failed"] for task in task_list)
-        state.planner_feedback = f"任务队列执行完成，共{total_tasks}个任务，成功{len([t for t in task_list if t.status == 'success'])}个"
-        logger.info(f"会话{state.session_id}：任务队列执行完成")
-        return state
+            # 2. 获取下一个待执行任务
+            next_task = self.get_next_pending_task(state)
+            if not next_task:
+                feedback = "任务队列无待执行任务，流程结束"
+                return {
+                    "executing_plan": True,
+                    "finished": True,
+                    "planner_feedback": feedback,
+                    "next_node": END,
+                    "messages": add_messages(state.messages, [SystemMessage(content=feedback)])
+                }
+
+            # 3. 更新当前任务为 running 状态
+            self.update_task_status(state, next_task.task_id, "running")
+
+            # 4. 获取要跳转的 LangGraph 节点
+            target_node = self.get_target_node(next_task)
+            if not target_node:
+                feedback = f"任务{next_task.task_id}（{next_task.node_name}）无法匹配功能节点，执行失败"
+                self.update_task_status(state, next_task.task_id, "failed", {"error": feedback})
+                return {
+                    "executing_plan": False,
+                    "current_task_id": next_task.task_id,
+                    "planner_feedback": feedback,
+                    "next_node": "executor_agent",  # 跳转回 executor，处理下一个任务
+                    "messages": add_messages(state.messages, [AIMessage(content=feedback)])
+                }
+
+            # 5. 返回跳转信息
+            feedback = f"即将执行任务{next_task.task_id}/{len(state.execution_plan)}：{next_task.description}，跳转至「{target_node}」节点"
+            logger.info(f"会话{state.session_id}：{feedback}")
+            return {
+                "executing_plan": True,
+                "current_task_id": next_task.task_id,
+                "current_task_node": target_node,
+                "planner_feedback": feedback,
+                "next_node": target_node,  # 告诉 LangGraph 下一步跳转的节点
+                "messages": add_messages(state.messages, [SystemMessage(content=feedback)])
+            }
+        except Exception as e:
+            error_msg = f"Executor 准备下一步流程失败：{str(e)}"
+            logger.error(f"会话{state.session_id}：{error_msg}")
+            return {
+                "executing_plan": False,
+                "finished": True,
+                "planner_feedback": error_msg,
+                "next_node": END,
+                "messages": add_messages(state.messages, [AIMessage(content=error_msg)])
+            }
 
 
 # 全局执行智能体实例

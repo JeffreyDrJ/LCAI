@@ -72,20 +72,19 @@ async def planner_node(state: LCAIState) -> Dict[str, Any]:
 async def executor_node(state: LCAIState) -> Dict[str, Any]:
     """执行节点：调度执行子任务队列"""
     try:
-        # 执行任务队列
-        updated_state = await executor_agent.execute_task_queue(state)
+        # 调用 ExecutorAgent 准备下一步队列任务
+        next_step_info = await executor_agent.execute_next_step(state)
         # 提取状态更新内容
+        # 返回状态更新（包含下一步跳转节点信息）
         return {
-            "execution_plan": updated_state.execution_plan,
-            "current_task_id": updated_state.current_task_id,
-            "executing_plan": updated_state.executing_plan,
-            "planner_feedback": updated_state.planner_feedback,
-            "app_id": updated_state.app_id,
-            "app_name": updated_state.app_name,
-            "model_id": updated_state.model_id,
-            "form_name": updated_state.form_name,
-            "finished": updated_state.finished,
-            "messages": add_messages(state.messages, [SystemMessage(content=updated_state.planner_feedback)])
+            "current_task_id": next_step_info.get("current_task_id"),
+            "current_task_node": next_step_info.get("current_task_node"),
+            "planner_feedback": next_step_info.get("planner_feedback"),
+            "goto": next_step_info.get("next_node"),
+            "finished": next_step_info.get("finished", False),
+            "messages": next_step_info.get("messages", state.messages),
+            "execution_plan": state.execution_plan,  # 同步更新后的任务队列
+            "executing_plan": next_step_info.get("executing_plan", False)  # 同步更新后的任务队列
         }
     except Exception as e:
         logger.error(f"执行节点执行失败：{str(e)}")
@@ -287,17 +286,42 @@ def app_template_query_branch(state: LCAIState) -> str:
         return "human_confirm"
 
 def planner_agent_branch(state: LCAIState) -> str:
-    """用户确认后判断流程走向"""
+    """任务规划"""
     if (settings.HUMAN_CONFIRM_PLAN):
         return "human_confirm"
     else:
         return "executor_agent"
+
+def executor_agent_branch(state: LCAIState) -> str:
+    """任务执行"""
+    return state.goto
 
 def human_confirm_branch(state: LCAIState) -> str:
     """用户确认后判断流程走向"""
     # 检查用户输入
     goto = state.goto
     return goto
+
+def app_name_extract_branch(state: LCAIState) -> str:
+    """提取用户名称"""
+    if state.executing_plan:
+        return "executor_agent"
+    else:
+        return "app_template_query"
+
+def app_create_branch(state: LCAIState) -> str:
+    """提取用户名称"""
+    if state.executing_plan:
+        return "executor_agent"
+    else:
+        return "form_build"
+
+def form_build_branch(state: LCAIState) -> str:
+    """搭建表单"""
+    if state.executing_plan:
+        return "executor_agent"
+    else:
+        return END
 
 
 # ------------------------------
@@ -347,15 +371,51 @@ def build_lcai_graph():
             END: END
         }
     )
+    # 添加分支边 - 任务执行
+    graph.add_conditional_edges(
+        "executor_agent",
+        executor_agent_branch,
+        {
+            "app_name_extract": "app_name_extract",
+            "app_create": "app_create",
+            "form_build": "form_build",
+            "human_confirm": "human_confirm",
+            END: END
+        }
+    )
 
     # 添加分支边 - 问答节点
     graph.add_edge("qa_agent", END)
 
     # 添加分支边 - 提取应用名称
-    graph.add_edge("app_name_extract", "app_template_query")
+    graph.add_conditional_edges(
+        "app_name_extract",
+        app_name_extract_branch,
+        {
+            "executor_agent": "executor_agent",
+            "app_template_query": "app_template_query"
+        }
+    )
 
-    # 添加分支边 - 提取应用名称
-    graph.add_edge("app_create", "form_build")
+    # 添加分支边 - 创建应用
+    graph.add_conditional_edges(
+        "app_create",
+        app_create_branch,
+        {
+            "executor_agent": "executor_agent",
+            "form_build": "form_build"
+        }
+    )
+
+    # 添加分支边 - 搭建表单
+    graph.add_conditional_edges(
+        "form_build",
+        form_build_branch,
+        {
+            "executor_agent": "executor_agent",
+            END: END
+        }
+    )
 
     # 添加分支边 - 查询应用模板
     graph.add_conditional_edges(

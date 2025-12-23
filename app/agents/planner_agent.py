@@ -25,7 +25,7 @@ class PlannerAgent:
             1. 基础功能节点名对照：
                 - 应用名提取对应节点名：app_name_extract
                 - 应用创建对应节点名：app_create
-                - 表单创建对应节点名：form_build
+                - 表单创建对应节点名：form_build (需要分析出表单名：form_name,用户的字段要求（可能没有,有的话返回字符串中文名逗号分隔就行）：field_requirements,记录至task_input)
             2. 依赖关系规则：
                 - app_name_extract 依赖 intent_recognition（且intent_type=app_build）；
                 - app_create 依赖 app_name_extract；

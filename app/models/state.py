@@ -21,11 +21,11 @@ class Task(BaseModel):
     # 3. 任务描述（用于日志、调试、人工查看）
     description: str = Field(default="", description="任务描述")
     # 4. 任务需求的参数
-    # task_input: Optional[Dict] = None
+    task_input: Optional[Dict] = None
     # 5. 任务状态（严格约束取值，避免非法状态）
     status: Literal["pending", "running", "success", "failed", "need_human"]
     # 6. 任务执行结果（节点运行后的输出，比如intent_recognition返回的intent_type）
-    # task_output: Optional[Dict] = None
+    task_output: Optional[Dict] = None
 
 # 新增：TaskPlan 包装类（必须直接继承 BaseModel，无泛型嵌套问题）
 class TaskPlan(BaseModel):
