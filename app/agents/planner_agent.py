@@ -1,7 +1,7 @@
 from typing import List
 
 from app.config.settings import settings
-from app.models.state import Task
+from app.models.state import Task, TaskPlan
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_openai import ChatOpenAI
@@ -13,9 +13,9 @@ from app.utils.logger import logger
 class PlannerAgent:
     def __init__(self):
         # self.llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
-        self.parser = PydanticOutputParser(pydantic_object=List[Task])
+        self.parser = PydanticOutputParser(pydantic_object=TaskPlan)
 
-    async def make_plan(self, user_input: str, chatId: str) -> List[Task]:
+    async def make_plan(self, user_input: str, chat_id: str) -> List[Task]:
         """
         拆分复杂用户需求为有序子任务
         """
@@ -40,21 +40,21 @@ class PlannerAgent:
             """),
             ("user", "用户需求：{user_input}")
         ]).partial(format_instructions=self.parser.get_format_instructions())
-
+        # 格式化 prompt 并调用 LLM
+        formatted_prompt = prompt.format(user_input=user_input)
         try:
-            # response = await self.llm.ainvoke(prompt.format_prompt(user_input=user_input))
             response = await ds_client.call_llm(
                 api_key=settings.DS_API_KEY_GENERAL_USE,
-                chatId=chatId,
-                prompt=prompt,
+                chatId=chat_id,
+                prompt=formatted_prompt,
                 stream=False,
                 temperature=0.3
             )
-            tasks = self.parser.parse(response.content)
-            logger.info(f"会话{chatId}：规划智能体拆分出{len(tasks)}个子任务")
+            tasks = self.parser.parse(response["content"]).tasks
+            logger.info(f"会话{chat_id}：规划智能体拆分出{len(tasks)}个子任务")
             return tasks
         except Exception as e:
-            logger.error(f"会话{chatId}：规划智能体任务拆分失败：{str(e)}")
+            logger.error(f"会话{chat_id}：规划智能体任务拆分失败：{str(e)}")
             # 兜底返回默认任务（针对会议预定应用场景）
             return [
                 Task(

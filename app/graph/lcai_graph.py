@@ -7,7 +7,9 @@ from typing import Dict, Any, AsyncGenerator
 
 from requests_toolbelt import user_agent
 
+from app.agents.executor_agent import executor_agent
 from app.agents.planner_agent import planner_agent
+from app.config.settings import settings
 from app.models.state import LCAIState
 
 from app.agents.intent_agent import intent_agent
@@ -45,12 +47,16 @@ async def intent_recognition_node(state: LCAIState) -> Dict[str, Any]:
                                      [AIMessage(content=f"抱歉，无法识别您的需求：{str(e)}")])
         }
 
+
 async def planner_node(state: LCAIState) -> Dict[str, Any]:
     """任务规划节点：拆分复杂用户需求"""
     try:
-        plan = await planner_agent.make_plan(user_input=state.user_input, chatId=state.session_id)
+        plan = await planner_agent.make_plan(user_input=state.user_input, chat_id=state.session_id)
+
         return {
-            "execution_plan": plan
+            "execution_plan": plan,
+            "msg": "",
+            "invoke_confirm_node": "planner_node" if len(plan) > 0 else ""
         }
     except PlanningError as e:
         logger.error(f"任务规划节点失败：{str(e)}")
@@ -60,6 +66,33 @@ async def planner_node(state: LCAIState) -> Dict[str, Any]:
             "finished": True,
             "messages": add_messages(state.messages,
                                      [AIMessage(content=f"抱歉，任务规划失败：{str(e)}")])
+        }
+
+
+async def executor_node(state: LCAIState) -> Dict[str, Any]:
+    """执行节点：调度执行子任务队列"""
+    try:
+        # 执行任务队列
+        updated_state = await executor_agent.execute_task_queue(state)
+        # 提取状态更新内容
+        return {
+            "execution_plan": updated_state.execution_plan,
+            "current_task_id": updated_state.current_task_id,
+            "executing_plan": updated_state.executing_plan,
+            "planner_feedback": updated_state.planner_feedback,
+            "app_id": updated_state.app_id,
+            "app_name": updated_state.app_name,
+            "model_id": updated_state.model_id,
+            "form_name": updated_state.form_name,
+            "finished": updated_state.finished,
+            "messages": add_messages(state.messages, [SystemMessage(content=updated_state.planner_feedback)])
+        }
+    except Exception as e:
+        logger.error(f"执行节点执行失败：{str(e)}")
+        return {
+            "finished": True,
+            "planner_feedback": f"执行节点执行失败：{str(e)}",
+            "messages": add_messages(state.messages, [AIMessage(content=f"抱歉，任务执行失败：{str(e)}")])
         }
 
 
@@ -152,13 +185,14 @@ async def app_create_node(state: LCAIState) -> Dict[str, Any]:
             "app_name": "unknown",
             "desc": f"应用创建失败：{str(e)}",
             "finished": True,
-            "messages": add_messages(state.messages,[AIMessage(content=f"应用创建失败：{str(e)}")])
+            "messages": add_messages(state.messages, [AIMessage(content=f"应用创建失败：{str(e)}")])
         }
+
 
 async def form_build_node(state: LCAIState) -> Dict[str, Any]:
     """创建一个新的表单"""
     try:
-        model_info = await form_build_agent.build_form(state=state, form_name="",form_prompt="")
+        model_info = await form_build_agent.build_form(state=state, form_name="", form_prompt="")
         # 组织返回消息
         model_id = model_info["model_id"]
         form_name = model_info["form_name"]
@@ -174,7 +208,7 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
             "app_name": "unknown",
             "desc": f"应用创建失败：{str(e)}",
             "finished": True,
-            "messages": add_messages(state.messages,[AIMessage(content=f"应用创建失败：{str(e)}")])
+            "messages": add_messages(state.messages, [AIMessage(content=f"应用创建失败：{str(e)}")])
         }
 
 
@@ -185,19 +219,23 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
     if state.invoke_confirm_node == "app_template_query_node":
         template_names = [template["templateCname"] for template in state.app_templates]
         question = f"请选择模板：{"，".join(template_names)}"
+    elif state.invoke_confirm_node == "planner_node":
+        question += "任务规划如下，请确认是否执行？（是/否）"
+        for task in state.execution_plan:
+            question += f"\n{task.task_id}.{task.description}"
     # 使用interrupt暂停流程
     action = interrupt(
         {
             "question": question,
             "paused": True,
-            "pause_at": "human_confirm"
+            "pause_at": state.invoke_confirm_node
         }
     )
     goto = ""
+    print(f"\n\n\n会话：{state.meta.chatId}恢复执行！用户输入：{action}")
+
     if state.invoke_confirm_node == "app_template_query_node":
         """询问用户是否使用模板"""
-        print(f"\n\n\n会话：{state.meta.chatId}恢复执行！用户输入：{action}")
-
         try:
             template_no = int(action)
             if template_no > 0:
@@ -209,7 +247,11 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
         except ValueError:
             # 如果没选择模板，也没说要新增，就从头开始意图分析
             goto = "intent_recognition"
-
+    elif state.invoke_confirm_node == "planner_node":
+        if action == "是":
+            goto = "executor_node"
+        else:
+            goto = END
         # return Command(goto=goto, update={"paused": False, "pause_at": "", "invoke_confirm_node": ""})
     # 这个函数会在用户回复后继续执行
     # 返回一个标识，表示需要等待用户输入
@@ -230,6 +272,8 @@ def intent_branch(state: LCAIState) -> str:
         return "qa_agent"
     elif intent_type == "app_build":
         return "app_build"
+    elif intent_type == "complex":
+        return "complex"
     else:
         return "qa_agent"
 
@@ -242,6 +286,12 @@ def app_template_query_branch(state: LCAIState) -> str:
     else:
         return "human_confirm"
 
+def planner_agent_branch(state: LCAIState) -> str:
+    """用户确认后判断流程走向"""
+    if (settings.HUMAN_CONFIRM_PLAN):
+        return "human_confirm"
+    else:
+        return "executor_agent"
 
 def human_confirm_branch(state: LCAIState) -> str:
     """用户确认后判断流程走向"""
@@ -263,6 +313,7 @@ def build_lcai_graph():
     ## 1/3 注册节点
     graph.add_node("intent_recognition", intent_recognition_node)
     graph.add_node("planner_agent", planner_node)
+    graph.add_node("executor_agent", executor_node)
     graph.add_node("qa_agent", qa_agent_node)
     graph.add_node("app_name_extract", appname_extract_node)
     graph.add_node("app_template_query", app_template_query_node)
@@ -283,6 +334,16 @@ def build_lcai_graph():
             "app_build": "app_name_extract",
             "complex": "planner_agent",
             "unknown": "qa_agent",
+            END: END
+        }
+    )
+    # 添加分支边 - 任务规划
+    graph.add_conditional_edges(
+        "planner_agent",
+        planner_agent_branch,
+        {
+            "human_confirm": "human_confirm",
+            "executor_agent": "executor_agent",
             END: END
         }
     )

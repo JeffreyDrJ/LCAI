@@ -4,15 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251219c 依赖更新">
-      <change afterPath="$PROJECT_DIR$/langgraph.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251222a 任务规划节点初步设计">
+      <change afterPath="$PROJECT_DIR$/app/agents/executor_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/agents/intent_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/intent_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/agents/planner_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/planner_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/v1/lcai.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/v1/lcai.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/graph/lcai_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/graph/lcai_graph.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/state.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/utils/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/exceptions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/项目搭建启动提示词.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/项目搭建启动提示词.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +28,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/dev251212a" />
+        <entry key="$PROJECT_DIR$" value="feature/dev251219c" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -54,40 +53,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.01-测试调用宝武DS单智能体.executor&quot;: &quot;Run&quot;,
-    &quot;Python.02-测试调用宝武DS单智能体(多轮对话).executor&quot;: &quot;Run&quot;,
-    &quot;Python.form_generate_util.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.human_test.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.lcai_draw_flowchart.executor&quot;: &quot;Run&quot;,
-    &quot;Python.lcai_graph.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.python app/main.py.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.state.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.测试GraphViz渲染流程图.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/dev251219c&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/mycode/lcai/app/services&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.01-测试调用宝武DS单智能体.executor": "Run",
+    "Python.02-测试调用宝武DS单智能体(多轮对话).executor": "Run",
+    "Python.form_generate_util.executor": "Debug",
+    "Python.human_test.executor": "Debug",
+    "Python.lcai_draw_flowchart.executor": "Run",
+    "Python.lcai_graph.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.python app/main.py.executor": "Debug",
+    "Python.state.executor": "Debug",
+    "Python.测试GraphViz渲染流程图.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "feature/dev251222a",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/mycode/lcai/app/agents",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\mycode\lcai\app\services" />
       <recent name="D:\mycode\lcai\app\agents" />
+      <recent name="D:\mycode\lcai\app\services" />
       <recent name="D:\mycode\lcai\src\tests" />
       <recent name="D:\mycode\lcai\docs" />
       <recent name="D:\mycode\lcai\src\utils" />
@@ -254,7 +253,7 @@
       <workItem from="1765932106425" duration="38100000" />
       <workItem from="1766038272396" duration="9169000" />
       <workItem from="1766106450687" duration="19861000" />
-      <workItem from="1766365533354" duration="13714000" />
+      <workItem from="1766365533354" duration="23445000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -512,7 +511,31 @@
       <option name="project" value="LOCAL" />
       <updated>1766133307515</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="dev251222a 任务规划节点初步设计">
+      <option name="closed" value="true" />
+      <created>1766393954887</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1766393954887</updated>
+    </task>
+    <task id="LOCAL-00034" summary="dev251222a 任务规划节点初步设计">
+      <option name="closed" value="true" />
+      <created>1766394040949</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1766394040949</updated>
+    </task>
+    <task id="LOCAL-00035" summary="dev251222a 任务规划节点初步设计">
+      <option name="closed" value="true" />
+      <created>1766394124792</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1766394124793</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -540,7 +563,8 @@
     <MESSAGE value="dev251219a 完成表单搭建智能体" />
     <MESSAGE value="dev251219b 移除敏感文件追踪" />
     <MESSAGE value="dev251219c 依赖更新" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251219c 依赖更新" />
+    <MESSAGE value="dev251222a 任务规划节点初步设计" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251222a 任务规划节点初步设计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -551,14 +575,34 @@
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="157" />
+          <url>file://$PROJECT_DIR$/app/agents/executor_agent.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="165" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/executor_agent.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
-          <line>51</line>
-          <option name="timeStamp" value="158" />
+          <line>75</line>
+          <option name="timeStamp" value="167" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/executor_agent.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="172" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>77</line>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/executor_agent.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="175" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -578,7 +622,7 @@
     <SUITE FILE_PATH="coverage/lcai$form_generate_util.coverage" NAME="form_generate_util Coverage Results" MODIFIED="1766124780891" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/utils/form" />
     <SUITE FILE_PATH="coverage/lcai$01_DS.coverage" NAME="01-测试调用宝武DS单智能体 Coverage Results" MODIFIED="1765443025312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$state.coverage" NAME="state Coverage Results" MODIFIED="1765765171708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/models" />
-    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1766387065533" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1766458099766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lcai$main.coverage" NAME="main Coverage Results" MODIFIED="1765437190173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>
