@@ -13,6 +13,7 @@ class IntentAgent:
     complex：用户需求较复杂，可拆分为多个子任务，如用户指定要创建多个应用、多个表单的情形，必然属于此类
     qa：低代码平台使用帮助、问答类需求
     app_build：搭建/修改低代码应用相关需求
+    form_modify: 修改表单
     human_confirm: 人工确认节点，只有明确说明要人工确认才返回这个！
     unknown：无法识别的意图
 
@@ -20,7 +21,7 @@ class IntentAgent:
     """
     #TODO 把提示词模板整合封装到LangchainTemplate里
     @classmethod
-    async def recognize_intent(cls, chatId, user_input: str) -> Literal["qa", "app_build", "complex", "unknown"]:
+    async def recognize_intent(cls, chatId, user_input: str) -> Literal["qa", "app_build", "complex", "form_modify", "unknown"]:
         """
         识别用户意图
         :param user_input: 用户输入

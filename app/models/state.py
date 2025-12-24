@@ -50,6 +50,7 @@ class LCAIState(BaseLCAIState):
     # 表单相关数据
     model_id: str = Field(default="", description="表单id")
     form_name: str = Field(default="", description="表单中文名")
+    views: Optional[Dict[str,Dict]] = Field(default={}, description="表单流程等信息")
     form_schema: Optional[FormSchema] = Field(default=None, description="表单结构")
     form_save_status: Optional[Literal["success", "failed"]] = Field(default=None, description="表单保存状态")
     form_save_msg: Optional[str] = Field(default=None, description="表单保存提示")
