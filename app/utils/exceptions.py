@@ -71,3 +71,9 @@ class FormBuildError(Exception):
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+
+class FormModifyError(Exception):
+    """表单修改异常"""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)

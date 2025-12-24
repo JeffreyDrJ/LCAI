@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from app.models.state import LCAIState
-from app.services import generate_new_form
+from app.services import formservice
 from app.services.ds_platform import ds_client
 from app.config.settings import settings
 from app.utils.exceptions import FormBuildError
@@ -11,6 +11,7 @@ from app.models.schema import FormSchema
 import json
 
 from app.utils.message.message_manage import push_intermediate_msg
+from app.utils.message.views import update_views
 
 
 class FormBuildAgent:
@@ -28,9 +29,9 @@ class FormBuildAgent:
     3. 下拉框字段必须提供options列表
     4. 仅返回JSON格式，不要额外解释
     5. 请确保生成字段的字段标识（model）,如select_4250rl8d的后8位唯一标识均不一样
-
+    6. 若表单字段过少，可以客观实用性为前提适当补充字段，保证表单字段在4个以上
     用户需求：
-    搭建“{form_name}”表单。{field_requirements}
+    搭建“{form_name}”表单。必要字段需求：{field_requirements}
     """
     model_id = ""
     model_json = {}
@@ -94,7 +95,7 @@ class FormBuildAgent:
         form_json = get_form_json_template()
         try:
             # 处理AI生成的表单字段内容
-            list_str = list_str.replace('\n','')
+            list_str = list_str.replace('\n', '')
             list = json.loads(list_str)
             form_json["list"] = list
             model_json = form_json
@@ -107,7 +108,7 @@ class FormBuildAgent:
         state = await push_intermediate_msg(state, "表单设计完成，正在初始化...")
         # 4.调用S_BE接口：
         try:
-            response = await generate_new_form.generate_form(
+            response = await formservice.generate_form(
                 form_name=form_name,
                 form_json=form_json,
                 app_id=state.app_id,
@@ -117,15 +118,16 @@ class FormBuildAgent:
             model_id = response["model_id"];
 
             logger.info(f"表单生成成功：form_name={form_name}({model_id})，字段数={len(model_json["list"])}")
-
-            return {
-                "model_id": model_id,
-                "form_name": form_name
-            }
-
         except Exception as e:
             logger.error(f"表单生成失败：{str(e)}", exc_info=True)
             raise FormBuildError(f"表单生成失败：{str(e)}")
-
+        # 5.更新表单信息
+        views = await update_views(state, model_id, "form", {"form_name": form_name, "list": form_json["list"]})
+        # 结果返回
+        return {
+            "model_id": model_id,
+            "form_name": form_name,
+            "views": views,
+        }
 # 全局实例
 form_build_agent = FormBuildAgent()

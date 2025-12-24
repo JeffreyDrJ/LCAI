@@ -8,6 +8,7 @@ from typing import Dict, Any, AsyncGenerator
 from requests_toolbelt import user_agent
 
 from app.agents.executor_agent import executor_agent
+from app.agents.form_modify_agent import form_modify_agent
 from app.agents.planner_agent import planner_agent
 from app.config.settings import settings
 from app.models.state import LCAIState
@@ -198,8 +199,29 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
         return {
             "model_id": model_id,
             "form_name": form_name,
+            "views": model_info["views"],
             "messages": add_messages(state.messages, [SystemMessage(content=f"表单创建成功:[{form_name}]")]),
             "msg": f"表单【{form_name}({model_id})】创建成功！"
+        }
+    except AppGenerateError as e:
+        logger.error(f"应用创建失败：{str(e)}")
+        return {
+            "app_name": "unknown",
+            "desc": f"应用创建失败：{str(e)}",
+            "finished": True,
+            "messages": add_messages(state.messages, [AIMessage(content=f"应用创建失败：{str(e)}")])
+        }
+
+async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
+    """修改表单"""
+    try:
+        model_info = await form_modify_agent.modify_form(state=state, modify_opinion=state.user_opinion)
+        # 组织返回消息
+        model_id = model_info["model_id"]
+        form_name = model_info["form_name"]
+        return {
+            "views": model_info["views"],
+            "msg": f""
         }
     except AppGenerateError as e:
         logger.error(f"应用创建失败：{str(e)}")
@@ -260,6 +282,27 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
         "goto": goto
     }
 
+async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
+    """监听节点，用于激活二轮对话"""
+    hint = ""
+
+    # 使用interrupt暂停流程
+    user_input = interrupt(
+        {
+            "question": hint,
+            "paused": True,
+            "pause_at": "chat_listener",
+        }
+    )
+    # 监听恢复：
+    print(f"\n\n\n会话：{state.meta.chatId}恢复执行！用户输入：{user_input}")
+
+    return {
+        "paused": False,
+        "pause_at": "",
+        "user_input": user_input
+    }
+
 
 # ------------------------------
 # 2. 定义分支判断函数 (用于条件分支边判断)
@@ -271,6 +314,8 @@ def intent_branch(state: LCAIState) -> str:
         return "qa_agent"
     elif intent_type == "app_build":
         return "app_build"
+    elif intent_type == "form_modify":
+        return "form_modify"
     elif intent_type == "complex":
         return "complex"
     else:
@@ -343,7 +388,9 @@ def build_lcai_graph():
     graph.add_node("app_template_query", app_template_query_node)
     graph.add_node("app_create", app_create_node)
     graph.add_node("form_build", form_build_node)
+    graph.add_node("form_modify", form_modify_node)
     graph.add_node("human_confirm", human_node)
+    graph.add_node("chat_listener", chat_listener_node)
 
     # 设置入口节点
     graph.set_entry_point("intent_recognition")
@@ -356,6 +403,7 @@ def build_lcai_graph():
         {
             "qa_agent": "qa_agent",
             "app_build": "app_name_extract",
+            "form_modify": "form_modify",
             "complex": "planner_agent",
             "unknown": "qa_agent",
             END: END
@@ -380,12 +428,15 @@ def build_lcai_graph():
             "app_create": "app_create",
             "form_build": "form_build",
             "human_confirm": "human_confirm",
-            END: END
+            END: "chat_listener"
         }
     )
 
     # 添加分支边 - 问答节点
     graph.add_edge("qa_agent", END)
+
+    # 添加分支边 - 结束监听节点
+    graph.add_edge("chat_listener", "intent_recognition")
 
     # 添加分支边 - 提取应用名称
     graph.add_conditional_edges(
@@ -413,7 +464,7 @@ def build_lcai_graph():
         form_build_branch,
         {
             "executor_agent": "executor_agent",
-            END: END
+            END: "chat_listener"
         }
     )
 
