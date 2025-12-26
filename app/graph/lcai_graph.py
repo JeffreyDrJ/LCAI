@@ -171,7 +171,12 @@ async def app_template_query_node(state: LCAIState) -> Dict[str, Any]:
 async def app_create_node(state: LCAIState) -> Dict[str, Any]:
     """创建一个新的应用"""
     try:
-        app_info = await app_create_agent.create_app(appName=state.app_name, meta=state.meta)
+        if state.choose_app_template < 0:
+            # 纯创建新应用
+            app_info = await app_create_agent.create_app(appName=state.app_name, meta=state.meta)
+        else:
+            # 启用应用模板
+            app_info = await app_create_agent.activate_app_template(state)
         # 组织返回消息
         return {
             "app_id": app_info["app_id"],
@@ -253,6 +258,7 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
         }
     )
     goto = ""
+    params = {}
     print(f"\n\n\n会话：{state.meta.chatId}恢复执行！用户输入：{action}")
 
     if state.invoke_confirm_node == "app_template_query_node":
@@ -260,11 +266,8 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
         try:
             template_no = int(action)
             if template_no > 0:
-                # 如果选择模板，就套用模板
-                goto = "app_create"
-            else:
-                # 如果要新增，就新增
-                goto = "app_create"
+                params["choose_app_template"] = template_no
+            goto = "app_create"
         except ValueError:
             # 如果没选择模板，也没说要新增，就从头开始意图分析
             goto = "intent_recognition"
@@ -277,6 +280,7 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
     # 这个函数会在用户回复后继续执行
     # 返回一个标识，表示需要等待用户输入
     return {
+        **params,
         "paused": False,
         "pause_at": "",
         "goto": goto
@@ -300,7 +304,9 @@ async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
     return {
         "paused": False,
         "pause_at": "",
-        "user_input": user_input
+        "user_input": user_input,
+        #重置参数：
+        "choose_app_template": -1,
     }
 
 
@@ -344,8 +350,10 @@ def executor_agent_branch(state: LCAIState) -> str:
 def human_confirm_branch(state: LCAIState) -> str:
     """用户确认后判断流程走向"""
     # 检查用户输入
-    goto = state.goto
-    return goto
+    if state.executing_plan:
+        return "executor_agent"
+    else:
+        return state.goto
 
 def app_name_extract_branch(state: LCAIState) -> str:
     """提取用户名称"""
@@ -358,6 +366,8 @@ def app_create_branch(state: LCAIState) -> str:
     """提取用户名称"""
     if state.executing_plan:
         return "executor_agent"
+    elif state.choose_app_template > 0:
+        return END
     else:
         return "form_build"
 
@@ -454,7 +464,8 @@ def build_lcai_graph():
         app_create_branch,
         {
             "executor_agent": "executor_agent",
-            "form_build": "form_build"
+            "form_build": "form_build",
+            END: "chat_listener"
         }
     )
 
