@@ -47,6 +47,7 @@ class LCAIState(BaseLCAIState):
     app_name: str = Field(default="", description="应用名称")
     # 应用模板数据
     app_templates: List = Field(default_factory=list, description="应用模板列表")
+    choose_app_template: int = Field(default=-1, description="用户选择的应用模板号")
     # 表单相关数据
     model_id: str = Field(default="", description="表单id")
     form_name: str = Field(default="", description="表单中文名")
