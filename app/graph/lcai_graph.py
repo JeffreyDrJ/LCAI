@@ -24,6 +24,7 @@ from app.utils.logger import logger
 from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError, AppGenerateError, PlanningError
 from langgraph.types import interrupt, Command
 from langgraph.types import Command
+from app.graph.hooks import node_pre_hook  # 导入前置钩子
 
 
 # ------------------------------
@@ -131,6 +132,7 @@ async def appname_extract_node(state: LCAIState) -> Dict[str, Any]:
         app_name = await app_name_extract_agent.recognize_appname(user_input=state.user_input, chatId=state.session_id)
         return {
             "app_name": app_name,
+            "msg": f"已提取到应用名：[{app_name}], 正在查询相关的应用模板...",
             "messages": add_messages(state.messages, [SystemMessage(content=f"应用名提取结果：{app_name}")])
         }
     except AppnameRecognitionError as e:
@@ -154,7 +156,7 @@ async def app_template_query_node(state: LCAIState) -> Dict[str, Any]:
             "app_templates": app_templates,
             "messages": add_messages(state.messages,
                                      [SystemMessage(content=f"共获取到：{len(template_names)}个应用模板。")]),
-            "msg": "，".join(template_names),
+            "msg": "",
             "invoke_confirm_node": "app_template_query_node" if len(template_names) > 0 else ""
         }
     except AppnameRecognitionError as e:
@@ -170,6 +172,7 @@ async def app_template_query_node(state: LCAIState) -> Dict[str, Any]:
 
 async def app_create_node(state: LCAIState) -> Dict[str, Any]:
     """创建一个新的应用"""
+    msg = ""
     try:
         if state.choose_app_template < 0:
             # 纯创建新应用
@@ -182,7 +185,7 @@ async def app_create_node(state: LCAIState) -> Dict[str, Any]:
             "app_id": app_info["app_id"],
             "app_name": app_info["app_name"],
             "messages": add_messages(state.messages, [SystemMessage(content=f"应用创建成功:[{app_info["app_name"]}]")]),
-            "msg": ""
+            "msg": msg
         }
     except AppGenerateError as e:
         logger.error(f"应用创建失败：{str(e)}")
@@ -217,6 +220,7 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
             "messages": add_messages(state.messages, [AIMessage(content=f"应用创建失败：{str(e)}")])
         }
 
+
 async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
     """修改表单"""
     try:
@@ -242,17 +246,34 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
     """人工确认节点：暂停流程等待用户输入"""
     # 问题
     question = ""
+    question_type = "confirm"
+    question_select = []
     if state.invoke_confirm_node == "app_template_query_node":
         template_names = [template["templateCname"] for template in state.app_templates]
-        question = f"请选择模板：{"，".join(template_names)}"
+        question = f"查询到以下相关应用模板，请选择是否启用模板："
+        question_type = "select"
+        for idx, template in enumerate(state.app_templates, start=1):
+            question_select.append({
+                "index": idx,
+                "key": template["templateCname"],
+                "value": str(idx)
+            })
+        question_select.append({
+            "index": -1,
+            "key": "通过智能体生成应用",
+            "value": -1
+        })
     elif state.invoke_confirm_node == "planner_node":
         question += "任务规划如下，请确认是否执行？（是/否）"
+        question_type = "confirm"
         for task in state.execution_plan:
             question += f"\n{task.task_id}.{task.description}"
     # 使用interrupt暂停流程
     action = interrupt(
         {
             "question": question,
+            "question_type": question_type,
+            "question_select": question_select,
             "paused": True,
             "pause_at": state.invoke_confirm_node
         }
@@ -286,6 +307,7 @@ async def human_node(state: LCAIState) -> Dict[str, Any]:
         "goto": goto
     }
 
+
 async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
     """监听节点，用于激活二轮对话"""
     hint = ""
@@ -295,6 +317,7 @@ async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
         {
             "question": hint,
             "paused": True,
+            "pre_finish": True,
             "pause_at": "chat_listener",
         }
     )
@@ -336,6 +359,7 @@ def app_template_query_branch(state: LCAIState) -> str:
     else:
         return "human_confirm"
 
+
 def planner_agent_branch(state: LCAIState) -> str:
     """任务规划"""
     if (settings.HUMAN_CONFIRM_PLAN):
@@ -343,9 +367,11 @@ def planner_agent_branch(state: LCAIState) -> str:
     else:
         return "executor_agent"
 
+
 def executor_agent_branch(state: LCAIState) -> str:
     """任务执行"""
     return state.goto
+
 
 def human_confirm_branch(state: LCAIState) -> str:
     """用户确认后判断流程走向"""
@@ -362,6 +388,7 @@ def app_name_extract_branch(state: LCAIState) -> str:
     else:
         return "app_template_query"
 
+
 def app_create_branch(state: LCAIState) -> str:
     """提取用户名称"""
     if state.executing_plan:
@@ -370,6 +397,7 @@ def app_create_branch(state: LCAIState) -> str:
         return END
     else:
         return "form_build"
+
 
 def form_build_branch(state: LCAIState) -> str:
     """搭建表单"""

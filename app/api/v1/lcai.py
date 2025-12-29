@@ -7,6 +7,7 @@ import json
 from langchain_core.messages import HumanMessage, BaseMessage
 from langgraph.types import Command
 
+
 from app.models.schema import LCAIRequest, LCAIResponse, LCAIStreamChunk, LCAIMeta
 from app.models.state import LCAIState
 from app.graph.lcai_graph import lcai_graph
@@ -118,27 +119,25 @@ async def stream_lcai(request: LCAIRequest):
                                 "node": "__interrupt__",
                                 "time": time.strftime('%Y-%m-%d %H:%M:%S'),
                                 "pause_info": {
+                                    **data,
                                     "session_id": request.meta.chatId,
-                                    "pause_at": data["pause_at"],
-                                    "message": data["question"],
                                     "sysMsg":"流程已暂停，请通过 /lcai/confirm 接口继续"
                                 },
                                 "finished": False
                             }
-                            print(f'会话{initial_state.session_id}|| 遇到中断节点【{data["pause_at"]},等待用户响应中...】')
-                            yield json.dumps(interrupt_info, ensure_ascii=False) + "\n\n"
+                            print(f'会话{initial_state.session_id}|| 遇到中断节点【{data["pause_at"]},等待用户响应中...\n信息：{data}】')
+                            yield f"data: {json.dumps(interrupt_info, ensure_ascii=False)}\n\n"
                     else:
                         if "messages" in node_data:
                             del node_data["messages"]
                         if "execution_plan" in node_data:
                             del node_data["execution_plan"]
-                        # node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
+                        if "node" not in node_data:
+                            node_data["node"] = node_name
+                        node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
                         print(f'会话{initial_state.session_id}|| 节点【{node_name}】输出:{node_data}')
                         # 流式返回消息内容（增量内容）
-                        yield json.dumps(
-                            node_data,
-                            ensure_ascii=False  # 核心参数：禁用ASCII转义
-                        )
+                        yield f"data: {json.dumps(node_data,ensure_ascii=False)}\n\n"
 
             # async for chunk in lcai_graph.astream(initial_state, config=thread, stream_mode="values"):
             #     print(chunk)
@@ -148,15 +147,12 @@ async def stream_lcai(request: LCAIRequest):
                 "msg": "",
                 "finished": True
             }
-            yield json.dumps(
-                end_chunk,
-                ensure_ascii=False  # 核心参数：禁用ASCII转义
-            )
+            yield f"data: {json.dumps(end_chunk,ensure_ascii=False)}\n\n"
 
         return StreamingResponse(
             stream_generator(),
             media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no","Connection": "keep-alive"}
         )
     except Exception as e:
         logger.error(f"LCAI流式调用失败：{str(e)}", exc_info=True)
@@ -205,38 +201,40 @@ async def confirm_lcai(
                 for node_name, node_data in chunk.items():
                     if node_name == "__interrupt__":
                         # 中断节点的node_data是tuple，需要特殊处理
-                        interrupt_info = {
-                            "type": "interrupt",
-                            "node": "__interrupt__",
-                            "time": time.strftime('%Y-%m-%d %H:%M:%S'),
-                            "pause_info": {
-                                "session_id": session_id,
-                                "message": "流程已暂停，请通过 /lcai/confirm 接口继续"
-                            },
-                            "finished": False
-                        }
-                        print(f'会话{session_id}|| 遇到中断节点【{node_name}】')
-                        yield json.dumps(interrupt_info, ensure_ascii=False) + "\n\n"
+                        for interrupt in node_data:
+                            data = interrupt.value
+                            interrupt_info = {
+                                "type": "interrupt",
+                                "node": "__interrupt__",
+                                "time": time.strftime('%Y-%m-%d %H:%M:%S'),
+                                "pause_info": {
+                                    **data,
+                                    "session_id": session_id,
+                                    "sysMsg": "流程已暂停，请通过 /lcai/confirm 接口继续"
+                                },
+                                "finished": False
+                            }
+                            print(
+                                f'会话{session_id}|| 遇到中断节点【{data["pause_at"]},等待用户响应中...\n信息：{data}】')
+                            yield f"data: {json.dumps(interrupt_info, ensure_ascii=False)}\n\n"
                     else:
                         if "messages" in node_data:
                             del node_data["messages"]
-                        # node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
+                        if "execution_plan" in node_data:
+                            del node_data["execution_plan"]
+                        if "node" not in node_data:
+                            node_data["node"] = node_name
+                        node_data["time"] = time.strftime('%Y-%m-%d %H:%M:%S')
                         print(f'会话{session_id}|| 节点【{node_name}】输出:{node_data}')
                         # 流式返回消息内容（增量内容）
-                        yield json.dumps(
-                            node_data,
-                            ensure_ascii=False  # 核心参数：禁用ASCII转义
-                        )
+                        yield f"data: {json.dumps(node_data, ensure_ascii=False)}\n\n"
             # 发送结束标识
             end_chunk = {
                 "type": "end",
                 "msg": "",
                 "finished": True
             }
-            yield json.dumps(
-                end_chunk,
-                ensure_ascii=False  # 核心参数：禁用ASCII转义
-            )
+            yield f"data: {json.dumps(end_chunk, ensure_ascii=False)}\n\n"
 
         return StreamingResponse(
             stream_generator(),
