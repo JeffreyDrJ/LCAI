@@ -59,11 +59,15 @@ class LCAIState(BaseLCAIState):
     # 表单多轮修改控制
     need_modify: bool = Field(default=False, description="是否需要修改表单")
     finished: bool = Field(default=False, description="流程是否结束")
+    pre_finish: bool = Field(default=False, description="流程是否进入结束监听")
     human_confirm: bool = Field(default=False, description="用户是否确认完成")
     # 人工节点控制
     invoke_confirm_node: str = Field(default="", description="请求人工确认的节点id")
     paused: bool = Field(default=False, description="流程是否暂停")
     pause_at: Optional[str] = None  # 暂停的节点（如 "human_confirm"）
+    question: str = Field(default="", description="中断提示")
+    question_type: str = Field(default="confirm", description="中断类型")
+    question_select: List = Field(default=[], description="中断选择信息")
     graph_checkpoint: Optional[Any] = None  # LangGraph流程断点
     goto: str = Field(default="", description="要跳转到的节点id")
     # 规划智能体新增字段
@@ -71,6 +75,8 @@ class LCAIState(BaseLCAIState):
     execution_plan: List[Task] = Field(default_factory=list)  # 执行计划（子任务列表）
     current_task_id: Optional[int] = None  # 当前执行的任务ID
     planner_feedback: Optional[str] = None  # 规划智能体的反馈/调整说明
+    # 前置钩子
+    progress_tips: str = Field(default="", description="节点前钩子提示")
 
 
 # 验证：实例化后必须是Pydantic对象，而非dict
