@@ -177,11 +177,9 @@ async def app_create_node(state: LCAIState) -> Dict[str, Any]:
         if state.choose_app_template < 0:
             # 纯创建新应用
             app_info = await app_create_agent.create_app(appName=state.app_name, meta=state.meta)
-            msg = "应用创建成功，正在设计表单..."
         else:
             # 启用应用模板
             app_info = await app_create_agent.activate_app_template(state)
-            msg = f"已通过应用模板创建应用：[{state.app_name}]"
         # 组织返回消息
         return {
             "app_id": app_info["app_id"],
@@ -330,7 +328,7 @@ async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
         "paused": False,
         "pause_at": "",
         "user_input": user_input,
-        # 重置参数：
+        #重置参数：
         "choose_app_template": -1,
     }
 
@@ -382,7 +380,6 @@ def human_confirm_branch(state: LCAIState) -> str:
         return "executor_agent"
     else:
         return state.goto
-
 
 def app_name_extract_branch(state: LCAIState) -> str:
     """提取用户名称"""
