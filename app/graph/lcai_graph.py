@@ -25,6 +25,7 @@ from app.utils.exceptions import IntentRecognitionError, AppnameRecognitionError
 from langgraph.types import interrupt, Command
 from langgraph.types import Command
 from app.graph.hooks import node_pre_hook  # 导入前置钩子
+from app.utils.website import get_app_run_url
 
 
 # ------------------------------
@@ -177,15 +178,20 @@ async def app_create_node(state: LCAIState) -> Dict[str, Any]:
         if state.choose_app_template < 0:
             # 纯创建新应用
             app_info = await app_create_agent.create_app(appName=state.app_name, meta=state.meta)
+            msg = "应用创建成功，正在设计表单..."
+            website = ""
         else:
             # 启用应用模板
             app_info = await app_create_agent.activate_app_template(state)
+            msg = f"已通过应用模板创建应用：[{state.app_name}]"
+            website = get_app_run_url(state.meta.origin, state.meta.cur_workspaceId, app_info["app_id"])
         # 组织返回消息
         return {
             "app_id": app_info["app_id"],
             "app_name": app_info["app_name"],
             "messages": add_messages(state.messages, [SystemMessage(content=f"应用创建成功:[{app_info["app_name"]}]")]),
-            "msg": msg
+            "msg": msg,
+            "website": website
         }
     except AppGenerateError as e:
         logger.error(f"应用创建失败：{str(e)}")
@@ -209,7 +215,8 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
             "form_name": form_name,
             "views": model_info["views"],
             "messages": add_messages(state.messages, [SystemMessage(content=f"表单创建成功:[{form_name}]")]),
-            "msg": f"表单【{form_name}({model_id})】创建成功！"
+            "msg": f"表单【{form_name}({model_id})】创建成功！",
+            "website": get_app_run_url(state.meta.origin, state.meta.cur_workspaceId, state.app_id)
         }
     except AppGenerateError as e:
         logger.error(f"应用创建失败：{str(e)}")
@@ -224,13 +231,14 @@ async def form_build_node(state: LCAIState) -> Dict[str, Any]:
 async def form_modify_node(state: LCAIState) -> Dict[str, Any]:
     """修改表单"""
     try:
-        model_info = await form_modify_agent.modify_form(state=state, modify_opinion=state.user_opinion)
+        model_info = await form_modify_agent.modify_form(state=state, modify_opinion=state.user_input)
         # 组织返回消息
         model_id = model_info["model_id"]
         form_name = model_info["form_name"]
         return {
             "views": model_info["views"],
-            "msg": f""
+            "msg": f"表单修改完毕。",
+            "website": get_app_run_url(state.meta.origin, state.meta.cur_workspaceId, state.app_id)
         }
     except AppGenerateError as e:
         logger.error(f"应用创建失败：{str(e)}")
@@ -406,6 +414,13 @@ def form_build_branch(state: LCAIState) -> str:
     else:
         return END
 
+def form_modify_branch(state: LCAIState) -> str:
+    """修改表单"""
+    if state.executing_plan:
+        return "executor_agent"
+    else:
+        return END
+
 
 # ------------------------------
 # 3. 构建LangGraph状态图
@@ -501,6 +516,16 @@ def build_lcai_graph():
     graph.add_conditional_edges(
         "form_build",
         form_build_branch,
+        {
+            "executor_agent": "executor_agent",
+            END: "chat_listener"
+        }
+    )
+
+    # 添加分支边 - 修改表单
+    graph.add_conditional_edges(
+        "form_modify",
+        form_modify_branch,
         {
             "executor_agent": "executor_agent",
             END: "chat_listener"
