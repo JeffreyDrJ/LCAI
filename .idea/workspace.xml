@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251229a 前台初步对接完成">
-      <change afterPath="$PROJECT_DIR$/app/utils/website.py" afterDir="false" />
+    <list default="true" id="8c9270e3-bab2-4c7e-8c87-f79aa2d6c4b2" name="Changes" comment="dev251224a 完成多轮对话，表单修改智能体">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/agents/form_modify_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/form_modify_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/agents/app_create_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/agents/app_create_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/graph/lcai_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/graph/lcai_graph.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/state.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/formservice.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/formservice.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/generate_new_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/appservice.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/dev251225a" />
+        <entry key="$PROJECT_DIR$" value="feature/dev251223a" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -71,7 +70,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/dev251229a&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/dev251224a&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/mycode/lcai/app/agents&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -256,10 +255,7 @@
       <workItem from="1766365533354" duration="41975000" />
       <workItem from="1766536830038" duration="2284000" />
       <workItem from="1766624390597" duration="1377000" />
-      <workItem from="1766646810824" duration="6504000" />
-      <workItem from="1766969137101" duration="22865000" />
-      <workItem from="1767055556246" duration="10432000" />
-      <workItem from="1767141835404" duration="15107000" />
+      <workItem from="1766646810824" duration="6209000" />
     </task>
     <task id="LOCAL-00001" summary="test101 新增一些测试，跑通了ds接口">
       <option name="closed" value="true" />
@@ -589,39 +585,7 @@
       <option name="project" value="LOCAL" />
       <updated>1766539237277</updated>
     </task>
-    <task id="LOCAL-00042" summary="dev251225a 完成应用模板启用">
-      <option name="closed" value="true" />
-      <created>1766653221937</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1766653221937</updated>
-    </task>
-    <task id="LOCAL-00043" summary="dev251225a 完成应用模板启用">
-      <option name="closed" value="true" />
-      <created>1766653262060</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1766653262060</updated>
-    </task>
-    <task id="LOCAL-00044" summary="dev251225a 完成应用模板启用">
-      <option name="closed" value="true" />
-      <created>1766653372436</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1766653372437</updated>
-    </task>
-    <task id="LOCAL-00045" summary="dev251229a 前台初步对接完成">
-      <option name="closed" value="true" />
-      <created>1766998122943</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1766998122943</updated>
-    </task>
-    <option name="localTasksCounter" value="46" />
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -653,9 +617,7 @@
     <MESSAGE value="dev251223a 任务规划节点初步完成，执行节点框架选型1" />
     <MESSAGE value="dev251223a 执行节点框架完成" />
     <MESSAGE value="dev251224a 完成多轮对话，表单修改智能体" />
-    <MESSAGE value="dev251225a 完成应用模板启用" />
-    <MESSAGE value="dev251229a 前台初步对接完成" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev251229a 前台初步对接完成" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev251224a 完成多轮对话，表单修改智能体" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -676,24 +638,54 @@
           <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/graph/hooks.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="218" />
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>149</line>
+          <option name="timeStamp" value="190" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_modify_agent.py</url>
-          <line>129</line>
-          <option name="timeStamp" value="264" />
+          <url>file://$PROJECT_DIR$/app/services/formservice.py</url>
+          <line>89</line>
+          <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_modify_agent.py</url>
-          <line>125</line>
-          <option name="timeStamp" value="265" />
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>268</line>
+          <option name="timeStamp" value="202" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/agents/form_modify_agent.py</url>
-          <line>69</line>
-          <option name="timeStamp" value="266" />
+          <url>file://$PROJECT_DIR$/app/agents/app_create_agent.py</url>
+          <line>58</line>
+          <option name="timeStamp" value="205" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/agents/app_create_agent.py</url>
+          <line>64</line>
+          <option name="timeStamp" value="207" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>173</line>
+          <option name="timeStamp" value="208" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>151</line>
+          <option name="timeStamp" value="209" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/graph/lcai_graph.py</url>
+          <line>178</line>
+          <option name="timeStamp" value="210" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/services/appservice.py</url>
+          <line>79</line>
+          <option name="timeStamp" value="211" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/services/appservice.py</url>
+          <line>85</line>
+          <option name="timeStamp" value="212" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -713,7 +705,7 @@
     <SUITE FILE_PATH="coverage/lcai$form_generate_util.coverage" NAME="form_generate_util Coverage Results" MODIFIED="1766124780891" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/utils/form" />
     <SUITE FILE_PATH="coverage/lcai$01_DS.coverage" NAME="01-测试调用宝武DS单智能体 Coverage Results" MODIFIED="1765443025312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/lcai$state.coverage" NAME="state Coverage Results" MODIFIED="1765765171708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/models" />
-    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1767158856155" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lcai$python_app_main_py.coverage" NAME="python app/main.py Coverage Results" MODIFIED="1766652645751" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lcai$main.coverage" NAME="main Coverage Results" MODIFIED="1765437190173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

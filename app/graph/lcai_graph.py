@@ -336,7 +336,7 @@ async def chat_listener_node(state: LCAIState) -> Dict[str, Any]:
         "paused": False,
         "pause_at": "",
         "user_input": user_input,
-        # 重置参数：
+        #重置参数：
         "choose_app_template": -1,
     }
 
@@ -388,7 +388,6 @@ def human_confirm_branch(state: LCAIState) -> str:
         return "executor_agent"
     else:
         return state.goto
-
 
 def app_name_extract_branch(state: LCAIState) -> str:
     """提取用户名称"""
