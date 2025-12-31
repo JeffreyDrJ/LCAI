@@ -77,6 +77,8 @@ class LCAIState(BaseLCAIState):
     planner_feedback: Optional[str] = None  # 规划智能体的反馈/调整说明
     # 前置钩子
     progress_tips: str = Field(default="", description="节点前钩子提示")
+    # 前端预览交互
+    website: str = Field(default="", description="网址")
 
 
 # 验证：实例化后必须是Pydantic对象，而非dict

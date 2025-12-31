@@ -28,6 +28,8 @@ class Settings(BaseConfig):
     API_PORT: int = int(os.getenv("API_PORT", 8000))
     API_CORS_ORIGINS: list = os.getenv("API_CORS_ORIGINS", "*").split(",")
 
+    # 低代码前端
+    CODE_DISPLAY_ORIGIN: str = os.getenv("CODE_DISPLAY_ORIGIN", "http://localhost:8080")
     # 会话配置
     CONTEXT_EXPIRE_TIME: int = int(os.getenv("CONTEXT_EXPIRE_TIME", 3600))
 
